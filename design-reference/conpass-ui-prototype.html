@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;1,500&family=Instrument+Sans:wght@400;500;600&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#FAFAF7;color:#4A544D;font-family:'Work Sans',sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  a{color:#1E7A50;text-decoration:none}
+  a:hover{color:#145C3B}
+  input,select,button,textarea{font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:#1E7A50 !important}
+  h1,h2,h3,h4,p{margin:0;text-wrap:pretty}
+  ::placeholder{color:#9AA39B}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes dropIn{0%{opacity:0;transform:translateY(-16px)}60%{transform:translateY(3px)}100%{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#FAFAF7;display:flex;flex-direction:column">
+
+  <header style="position:sticky;top:0;z-index:20;background:rgba(250,250,247,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(27,35,30,.1);padding:13px 22px;display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+    <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em;color:#1B231E;display:flex;align-items:flex-end;line-height:1">conpass<span style="width:6px;height:6px;border-radius:50%;background:#1E7A50;margin-left:3px;margin-bottom:2px"></span></div>
+    <nav style="display:flex;gap:6px;flex-wrap:wrap">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="6">
+        <button onClick="{{ item.on }}" style="{{ item.style }}">
+          <span style="{{ item.numStyle }}">{{ item.n }}</span>{{ item.t }}
+        </button>
+      </sc-for>
+    </nav>
+  </header>
+
+  <main style="flex:1;width:100%;max-width:1240px;margin:0 auto;padding:clamp(22px,4vw,44px) 22px 72px">
+
+    <!-- ============ FEATURE 1 ============ -->
+    <sc-if value="{{ f1 }}" hint-placeholder-val="{{ true }}">
+    <section style="animation:fadeUp .28s ease both">
+      <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#7A837C">Función 01 · Público</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:500;font-size:clamp(27px,3.4vw,34px);line-height:1.2;color:#1B231E;letter-spacing:-.01em;margin-top:6px">Registro del cliente</h2>
+      <p style="max-width:560px;margin-top:8px;font-size:15.5px;line-height:1.55;color:#4A544D">Formulario público donde el cliente de un comercio ingresa sus datos para recibir su <b style="color:#1B231E">tarjeta de lealtad</b> en el wallet del teléfono. Termina en el paso de añadir al wallet.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:26px;margin-top:28px;align-items:flex-start">
+
+        <!-- State A: form -->
+        <div style="flex:1 1 340px;max-width:380px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">A · Formulario</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:22px;overflow:hidden">
+            <div style="padding:26px 24px 22px;text-align:center;border-bottom:1px solid rgba(27,35,30,.08)">
+              <div style="width:52px;height:52px;border-radius:50%;margin:0 auto 12px;background:repeating-linear-gradient(45deg,#F3F2EC,#F3F2EC 5px,#EDEBE2 5px,#EDEBE2 10px);border:1px dashed #C9C8BF;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:8px;color:#9AA39B">LOGO</div>
+              <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px;color:#1B231E">Café Vecino</div>
+              <div style="font-size:12.5px;color:#7A837C;margin-top:2px">Programa de lealtad</div>
+            </div>
+            <div style="padding:22px 24px;display:flex;flex-direction:column;gap:15px">
+              <div>
+                <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Tipo de programa</span>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button onClick="{{ setSignupLoyalty }}" style="{{ signupLoyaltyBtn }}">Tarjeta de lealtad</button>
+                  <button onClick="{{ setSignupPass }}" style="{{ signupPassBtn }}">Pase de membresía</button>
+                </div>
+              </div>
+              <div>
+                <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:20px;color:#1B231E">{{ su1Heading }}</h3>
+                <p style="font-size:13px;line-height:1.5;color:#6A736C;margin-top:4px">{{ su1Sub }}</p>
+              </div>
+
+              <div style="background:#F3F2EC;border:1px solid rgba(27,35,30,.1);border-radius:12px;padding:14px 14px 15px">
+                <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Código de acceso</span>
+                <p style="font-size:11.5px;line-height:1.45;color:#9AA39B;margin-top:3px">Requerido para pases y programas exclusivos.</p>
+                <div style="display:flex;gap:8px;margin-top:9px">
+                  <input placeholder="GYM-2026" style="flex:1;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF;letter-spacing:.04em"><button onClick="{{ validateCode }}" style="{{ validateBtn }}">{{ validateLabel }}</button>
+                </div>
+                <sc-if value="{{ codeValid }}">
+                  <div style="display:flex;align-items:center;gap:7px;margin-top:10px;color:#1E7A50"><span>✓</span><span style="font-size:12.5px;font-weight:500;font-family:'Instrument Sans',sans-serif">Código válido · Pase Gimnasio Norte</span></div>
+                </sc-if>
+              </div>
+
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Nombre completo</span><input placeholder="María Torres" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Correo electrónico</span><input placeholder="maria@correo.com" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Teléfono (WhatsApp)</span><input placeholder="+593 99 123 4567" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <div>
+                <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Cumpleaños</span>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <input placeholder="Día" style="width:50%;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF">
+                  <input placeholder="Mes" style="width:50%;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF">
+                </div>
+              </div>
+              <label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer"><input type="checkbox" checked style="margin-top:2px;width:16px;height:16px;accent-color:#1E7A50"><span style="font-size:11.5px;line-height:1.45;color:#6A736C">Acepto recibir mi tarjeta y comunicaciones del comercio por WhatsApp y correo.</span></label>
+              <button style="width:100%;padding:15px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px" style-hover="background:#145C3B">Obtener mi tarjeta</button>
+              <p style="font-size:11px;line-height:1.45;color:#9AA39B;text-align:center">Sus datos están protegidos y solo los usa este comercio.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- State B: add to wallet -->
+        <div style="flex:1 1 340px;max-width:380px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">B · Añadir al wallet</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:22px;overflow:hidden">
+            <div style="padding:30px 26px 22px;text-align:center">
+              <div style="width:56px;height:56px;border-radius:50%;margin:0 auto 14px;background:rgba(30,122,80,.1);color:#1E7A50;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1">✓</div>
+              <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:23px;color:#1B231E">{{ su1DoneTitle }}</h3>
+              <p style="font-size:13.5px;line-height:1.5;color:#6A736C;margin-top:6px">{{ su1DoneSub }}</p>
+            </div>
+            <div style="padding:0 26px 8px">
+              <!-- loyalty · sellos -->
+              <sc-if value="{{ su1LoyaltyStamps }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#1E7A50;border-radius:16px;padding:18px 18px 16px;color:#fff;box-shadow:0 8px 24px rgba(30,122,80,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div>
+                    <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#BEE6CF">Tarjeta de lealtad</div>
+                    <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px;margin-top:3px">Café Vecino</div>
+                  </div>
+                  <div style="font-size:12px;color:#BEE6CF">María T.</div>
+                </div>
+                <div style="display:flex;gap:9px;margin:18px 0 12px;flex-wrap:wrap">
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                </div>
+                <div style="font-size:12px;color:#DBF0E4">0 / 8 sellos · La 8.ª bebida es gratis</div>
+              </div>
+              </sc-if>
+
+              <!-- loyalty · puntos -->
+              <sc-if value="{{ su1LoyaltyPoints }}">
+              <div style="background:#1E7A50;border-radius:16px;padding:18px 18px 16px;color:#fff;box-shadow:0 8px 24px rgba(30,122,80,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div>
+                    <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#BEE6CF">Tarjeta de lealtad</div>
+                    <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px;margin-top:3px">Café Vecino</div>
+                  </div>
+                  <div style="font-size:12px;color:#BEE6CF">María T.</div>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:6px;margin:16px 0 10px">
+                  <span style="font-family:'Newsreader',serif;font-weight:500;font-size:34px;line-height:1">0</span>
+                  <span style="font-size:13px;color:#DBF0E4">/ 100 puntos</span>
+                </div>
+                <div style="height:7px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden;margin-bottom:10px"><div style="height:100%;width:0%;background:#fff;border-radius:99px"></div></div>
+                <div style="font-size:12px;color:#DBF0E4">Sume puntos en cada compra · canjee a los 100 puntos</div>
+              </div>
+              </sc-if>
+
+              <!-- pase de membresía -->
+              <sc-if value="{{ su1Pass }}">
+              <div style="background:#1E7A50;border-radius:16px;padding:18px 18px 16px;color:#fff;box-shadow:0 8px 24px rgba(30,122,80,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div>
+                    <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#BEE6CF">Pase de membresía</div>
+                    <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px;margin-top:3px">Gimnasio Norte</div>
+                  </div>
+                  <div style="font-size:12px;color:#BEE6CF">María T.</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px">
+                  <span style="width:9px;height:9px;border-radius:50%;background:#DBF0E4"></span>
+                  <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px">Acceso activo</span>
+                </div>
+                <div style="font-size:12px;color:#DBF0E4">Membresía mensual · vigente hasta 31 ago 2026</div>
+              </div>
+              </sc-if>
+            </div>
+            <div style="padding:16px 26px 26px;display:flex;flex-direction:column;gap:10px">
+              <button style="width:100%;padding:13px;background:#1B231E;color:#fff;border:none;border-radius:11px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px"><span style="width:16px;height:16px;border-radius:4px;background:repeating-linear-gradient(45deg,#3a423c,#3a423c 3px,#4a544d 3px,#4a544d 6px)"></span>Añadir a Apple Wallet</button>
+              <button style="width:100%;padding:13px;background:#1B231E;color:#fff;border:none;border-radius:11px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:center;gap:8px"><span style="width:16px;height:16px;border-radius:4px;background:repeating-linear-gradient(45deg,#3a423c,#3a423c 3px,#4a544d 3px,#4a544d 6px)"></span>Añadir a Google Wallet</button>
+              <p style="font-size:11px;line-height:1.45;color:#9AA39B;text-align:center;margin-top:2px">También le enviamos el enlace por WhatsApp.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ FEATURE 2 ============ -->
+    <sc-if value="{{ f2 }}">
+    <section style="animation:fadeUp .28s ease both">
+      <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#7A837C">Función 02 · B2B</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:500;font-size:clamp(27px,3.4vw,34px);line-height:1.2;color:#1B231E;letter-spacing:-.01em;margin-top:6px">Suscripción del comercio</h2>
+      <p style="max-width:560px;margin-top:8px;font-size:15.5px;line-height:1.55;color:#4A544D">El dueño de un negocio se suscribe a conpass: datos del negocio, contacto, plan y pago para activar su cuenta.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:26px;margin-top:28px;align-items:flex-start">
+        <!-- form column -->
+        <div style="flex:2 1 440px;min-width:320px;display:flex;flex-direction:column;gap:20px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B">A · Alta y pago</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:16px;padding:22px">
+            <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:19px;color:#1B231E;margin-bottom:16px">Datos del negocio</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Nombre comercial</span><input placeholder="Café Vecino" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">RUC</span><input placeholder="1790012345001" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Categoría</span><select style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"><option>Cafetería / Restaurante</option><option>Gimnasio</option><option>Retail</option><option>Eventos</option></select></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Ciudad</span><input placeholder="Quito" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Nombre de contacto</span><input placeholder="Andrés Pérez" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Correo</span><input placeholder="andres@cafevecino.ec" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:16px;padding:22px">
+            <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:19px;color:#1B231E;margin-bottom:16px">Pago</h3>
+
+            <div style="display:flex;gap:8px;margin-bottom:18px">
+              <button onClick="{{ setPayCard }}" style="{{ payCardBtn }}">Tarjeta de crédito</button>
+              <button onClick="{{ setPayDeuna }}" style="{{ payDeunaBtn }}">DEUNA</button>
+            </div>
+
+            <sc-if value="{{ payIsCard }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Número de tarjeta</span><input placeholder="4242 4242 4242 4242" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <div style="display:flex;gap:14px">
+                <label style="display:block;flex:1"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Vencimiento</span><input placeholder="MM / AA" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+                <label style="display:block;flex:1"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">CVC</span><input placeholder="123" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              </div>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ payIsDeuna }}">
+            <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start">
+              <div style="flex:none;text-align:center">
+                <div style="width:132px;height:132px;border-radius:12px;border:1px solid rgba(27,35,30,.14);background:repeating-linear-gradient(45deg,#1B231E,#1B231E 6px,#2b332d 6px,#2b332d 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:9px;color:#DBE0DB">QR DEUNA</div>
+                <div style="font-size:11px;color:#9AA39B;margin-top:8px">Escanee con su app<br>de banco / DEUNA</div>
+              </div>
+              <div style="flex:1;min-width:180px">
+                <div style="display:flex;justify-content:space-between;font-size:13.5px;color:#4A544D;padding:4px 0"><span>Monto a pagar</span><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;color:#1B231E">$49.00</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13.5px;color:#4A544D;padding:4px 0;border-bottom:1px solid rgba(27,35,30,.08)"><span>Beneficiario</span><span style="color:#1B231E">conpass S.A.</span></div>
+                <p style="font-size:12px;line-height:1.5;color:#6A736C;margin-top:12px">Realice la transferencia con DEUNA y adjunte el comprobante para activar su cuenta.</p>
+                <div style="margin-top:12px;border:1px dashed #C9C8BF;border-radius:10px;background:repeating-linear-gradient(45deg,#F3F2EC,#F3F2EC 5px,#EDEBE2 5px,#EDEBE2 10px);padding:16px 12px;text-align:center;cursor:pointer">
+                  <div style="font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.05em;color:#7A837C">COMPROBANTE</div>
+                  <div style="font-size:12px;color:#4A544D;margin-top:6px">Adjuntar comprobante de pago</div>
+                  <div style="font-size:10px;color:#9AA39B;margin-top:2px">JPG o PDF</div>
+                </div>
+              </div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <!-- plan + summary column -->
+        <div style="flex:1 1 300px;min-width:280px;display:flex;flex-direction:column;gap:20px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B">Elija su plan</div>
+          <!-- Starter -->
+          <label style="display:block;background:#FFFFFF;border:1px solid rgba(27,35,30,.16);border-radius:14px;padding:18px;cursor:pointer">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;color:#1B231E">Starter</span>
+              <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;color:#1B231E">$19<span style="font-size:12px;color:#7A837C;font-weight:400">/mes</span></span>
+            </div>
+            <p style="font-size:12.5px;line-height:1.5;color:#6A736C;margin-top:6px">1 programa · hasta 500 tarjetas activas · notificaciones básicas.</p>
+          </label>
+          <!-- Growth (highlighted, inverted) -->
+          <label style="display:block;background:#1B231E;border:1px solid #1B231E;border-radius:14px;padding:18px;cursor:pointer;position:relative">
+            <span style="position:absolute;top:-10px;left:18px;background:#1E7A50;color:#fff;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:99px">Recomendado</span>
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;color:#FAFAF7">Growth</span>
+              <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;color:#8FD1AE">$49<span style="font-size:12px;color:#8FB8A2;font-weight:400">/mes</span></span>
+            </div>
+            <p style="font-size:12.5px;line-height:1.5;color:#B7BEB8;margin-top:6px">Programas ilimitados · tarjetas ilimitadas · notificaciones push · métricas y ROI.</p>
+          </label>
+
+          <div style="background:rgba(30,122,80,.06);border:1px solid rgba(30,122,80,.2);border-radius:14px;padding:18px">
+            <div style="display:flex;justify-content:space-between;font-size:14px;color:#4A544D"><span>Plan Growth</span><span style="color:#1B231E">$49.00</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:#7A837C;margin-top:6px"><span>Facturado mensual · USD</span><span>IVA incl.</span></div>
+            <div style="border-top:1px solid rgba(27,35,30,.12);margin:14px 0"></div>
+            <div style="display:flex;justify-content:space-between;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1B231E"><span>Total hoy</span><span>$49.00</span></div>
+            <button style="width:100%;margin-top:16px;padding:15px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px" style-hover="background:#145C3B">{{ payCta }}</button>
+            <p style="font-size:11px;line-height:1.45;color:#9AA39B;text-align:center;margin-top:10px">Puede cancelar cuando quiera. Sin permanencia.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- State B confirmation -->
+      <div style="margin-top:34px">
+        <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">B · Cuenta activada</div>
+        <div style="background:#141B16;border-radius:16px;padding:34px;max-width:560px;color:#DBE0DB">
+          <div style="width:52px;height:52px;border-radius:50%;background:rgba(143,209,174,.16);color:#8FD1AE;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:16px">✓</div>
+          <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:26px;color:#FAFAF7">Su cuenta está activa</h3>
+          <p style="font-size:14.5px;line-height:1.55;color:#B7BEB8;margin-top:8px;max-width:420px">Le enviamos sus accesos a <span style="color:#8FD1AE">andres@cafevecino.ec</span>. Cree su primera tarjeta de lealtad en menos de dos minutos.</p>
+          <button style="margin-top:20px;padding:14px 22px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Ir a mi panel</button>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ FEATURE 3 ============ -->
+    <sc-if value="{{ f3 }}">
+    <section style="animation:fadeUp .28s ease both">
+      <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#7A837C">Función 03 · Transaccional</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:500;font-size:clamp(27px,3.4vw,34px);line-height:1.2;color:#1B231E;letter-spacing:-.01em;margin-top:6px">Email de bienvenida</h2>
+      <p style="max-width:560px;margin-top:8px;font-size:15.5px;line-height:1.55;color:#4A544D">Correo transaccional tras la compra: entrega las credenciales de acceso del negocio y sus primeros pasos.</p>
+
+      <div style="margin-top:28px;max-width:600px">
+        <!-- mail meta -->
+        <div style="background:#F3F2EC;border:1px solid rgba(27,35,30,.1);border-bottom:none;border-radius:14px 14px 0 0;padding:16px 20px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-size:12px;color:#7A837C">De <span style="color:#1B231E;font-weight:600">conpass &lt;hola@conpass.co&gt;</span></div>
+          <div style="font-family:'Instrument Sans',sans-serif;font-size:12px;color:#7A837C;margin-top:3px">Para <span style="color:#1B231E">andres@cafevecino.ec</span></div>
+          <div style="font-family:'Newsreader',serif;font-size:17px;color:#1B231E;margin-top:8px">Bienvenido a conpass — aquí están sus accesos</div>
+        </div>
+        <!-- email body -->
+        <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:0 0 14px 14px;overflow:hidden">
+          <div style="padding:26px 32px 20px;border-bottom:1px solid rgba(27,35,30,.08)">
+            <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:19px;letter-spacing:-.02em;color:#1B231E;display:flex;align-items:flex-end;line-height:1">conpass<span style="width:5px;height:5px;border-radius:50%;background:#1E7A50;margin-left:3px;margin-bottom:2px"></span></div>
+          </div>
+          <div style="padding:28px 32px">
+            <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:24px;color:#1B231E;line-height:1.25">Le damos la bienvenida, Andrés</h3>
+            <p style="font-size:15px;line-height:1.6;color:#4A544D;margin-top:12px">Su cuenta de <b style="color:#1B231E">Café Vecino</b> ya está activa en el plan Growth. Use estos datos para entrar a su panel y crear su primera tarjeta de lealtad.</p>
+
+            <div style="background:#F3F2EC;border:1px solid rgba(27,35,30,.1);border-radius:12px;padding:18px 20px;margin-top:20px">
+              <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7A837C;margin-bottom:12px">Sus accesos</div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13.5px"><span style="color:#6A736C">Panel</span><span style="color:#1E7A50;font-family:ui-monospace,monospace">app.conpass.co/cafe-vecino</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13.5px"><span style="color:#6A736C">Usuario</span><span style="color:#1B231E;font-family:ui-monospace,monospace">andres@cafevecino.ec</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13.5px"><span style="color:#6A736C">Contraseña temporal</span><span style="color:#1B231E;font-family:ui-monospace,monospace">cv-8F42-tmp</span></div>
+            </div>
+
+            <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7A837C;margin:24px 0 12px">Primeros pasos</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;gap:12px;align-items:flex-start"><span style="flex:none;width:22px;height:22px;border-radius:50%;background:#1E7A50;color:#fff;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center">1</span><span style="font-size:14px;line-height:1.5;color:#4A544D">Cree su <b style="color:#1B231E">tarjeta de lealtad</b>: defina sellos y recompensa.</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start"><span style="flex:none;width:22px;height:22px;border-radius:50%;background:#1E7A50;color:#fff;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center">2</span><span style="font-size:14px;line-height:1.5;color:#4A544D">Personalice el diseño con su logo y colores.</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start"><span style="flex:none;width:22px;height:22px;border-radius:50%;background:#1E7A50;color:#fff;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center">3</span><span style="font-size:14px;line-height:1.5;color:#4A544D">Comparta el enlace de registro con sus clientes.</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start"><span style="flex:none;width:22px;height:22px;border-radius:50%;background:#1E7A50;color:#fff;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center">4</span><span style="font-size:14px;line-height:1.5;color:#4A544D">Capacite a su equipo para escanear y sumar sellos.</span></div>
+            </div>
+
+            <button style="margin-top:24px;padding:14px 24px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer">Entrar a mi panel</button>
+            <p style="font-size:13px;line-height:1.55;color:#6A736C;margin-top:20px">¿Necesita ayuda? Responda a este correo o escríbanos por WhatsApp al <span style="color:#1B231E">+593 99 000 0000</span>.</p>
+          </div>
+          <div style="padding:20px 32px;border-top:1px solid rgba(27,35,30,.08);background:#FAFAF7">
+            <p style="font-size:11.5px;line-height:1.5;color:#9AA39B">conpass · Tarjetas de lealtad y pases en Apple Wallet y Google Wallet.<br>Recibió este correo porque activó una cuenta en conpass.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ FEATURE 4 ============ -->
+    <sc-if value="{{ f4 }}">
+    <section style="animation:fadeUp .28s ease both">
+      <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#7A837C">Función 04 · Plataforma</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:500;font-size:clamp(27px,3.4vw,34px);line-height:1.2;color:#1B231E;letter-spacing:-.01em;margin-top:6px">Administración de la plataforma</h2>
+      <p style="max-width:560px;margin-top:8px;font-size:15.5px;line-height:1.55;color:#4A544D">Su panel como dueño de conpass: lista de clientes B2B, gestión de suscripción y estado de pago de cada uno.</p>
+
+      <!-- metrics row -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:26px">
+        <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Clientes activos</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:28px;color:#1B231E;margin-top:6px">128</div></div>
+        <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">MRR</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:28px;color:#1E7A50;margin-top:6px">$4,912</div></div>
+        <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Growth / Starter</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:28px;color:#1B231E;margin-top:6px">71 / 57</div></div>
+        <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Pagos vencidos</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:28px;color:#B4462E;margin-top:6px">6</div></div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:24px;margin-top:24px;align-items:flex-start">
+        <!-- table -->
+        <div style="flex:2 1 460px;min-width:320px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">A · Lista de clientes</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.6fr .8fr 1fr .8fr;gap:8px;padding:12px 18px;background:#F3F2EC;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A837C">
+              <span>Comercio</span><span>Plan</span><span>Estado de pago</span><span style="text-align:right">MRR</span>
+            </div>
+            <sc-for list="{{ clients }}" as="c" hint-placeholder-count="6">
+              <div onClick="{{ c.on }}" style="{{ c.rowStyle }}">
+                <div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;color:#1B231E">{{ c.name }}</div><div style="font-size:11.5px;color:#9AA39B">{{ c.city }}</div></div>
+                <span style="font-size:13px;color:#4A544D;align-self:center">{{ c.plan }}</span>
+                <span style="align-self:center"><span style="{{ c.badgeStyle }}">{{ c.status }}</span></span>
+                <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13.5px;color:#1B231E;text-align:right;align-self:center">{{ c.mrr }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- detail -->
+        <div style="flex:1 1 280px;min-width:270px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">B · {{ sel.name }}</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div><div style="font-family:'Newsreader',serif;font-size:20px;color:#1B231E">{{ sel.name }}</div><div style="font-size:12.5px;color:#9AA39B;margin-top:2px">{{ sel.city }} · desde {{ sel.since }}</div></div>
+              <span style="{{ sel.badgeStyle }}">{{ sel.status }}</span>
+            </div>
+
+            <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C;margin:20px 0 8px">Plan de suscripción</div>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ setStarter }}" style="{{ starterBtn }}">Starter · $19</button>
+              <button onClick="{{ setGrowth }}" style="{{ growthBtn }}">Growth · $49</button>
+            </div>
+
+            <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C;margin:20px 0 8px">Estado de pago</div>
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;color:#4A544D;padding:4px 0"><span>Próximo cobro</span><span style="color:#1B231E">{{ sel.next }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;color:#4A544D;padding:4px 0"><span>Último pago</span><span style="color:#1B231E">{{ sel.last }}</span></div>
+
+            <div style="display:flex;flex-direction:column;gap:9px;margin-top:20px">
+              <button onClick="{{ markPaid }}" style="width:100%;padding:12px;background:#1E7A50;color:#fff;border:none;border-radius:11px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Marcar como pagado</button>
+              <button style="width:100%;padding:12px;background:transparent;color:#1B231E;border:1px solid rgba(27,35,30,.2);border-radius:11px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Suspender cuenta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ FEATURE 5 ============ -->
+    <sc-if value="{{ f5 }}">
+    <section style="animation:fadeUp .28s ease both">
+      <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#7A837C">Función 05 · Comercio</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:500;font-size:clamp(27px,3.4vw,34px);line-height:1.2;color:#1B231E;letter-spacing:-.01em;margin-top:6px">Panel del comercio</h2>
+      <p style="max-width:560px;margin-top:8px;font-size:15.5px;line-height:1.55;color:#4A544D">El dueño configura su programa (tarjeta de lealtad o pase, válido en Apple y Google Wallet) y sigue sus métricas clave.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:26px;margin-top:28px;align-items:flex-start">
+        <!-- config form -->
+        <div style="flex:1 1 360px;min-width:300px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">A · Crear programa</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px">
+            <div>
+              <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Tipo de programa</span>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button onClick="{{ setLoyalty }}" style="{{ loyaltyBtn }}">Tarjeta de lealtad</button>
+                <button onClick="{{ setPass }}" style="{{ passBtn }}">Pase de acceso</button>
+              </div>
+            </div>
+            <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Nombre del programa</span><input value="{{ progName }}" placeholder="Club Café Vecino" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+
+            <sc-if value="{{ isLoyalty }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Mecánica de recompensa</span>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button onClick="{{ setMechStamps }}" style="{{ mechStampsBtn }}">Sellos</button>
+                  <button onClick="{{ setMechPoints }}" style="{{ mechPointsBtn }}">Puntos</button>
+                </div>
+              </div>
+              <sc-if value="{{ mechIsStamps }}" hint-placeholder-val="{{ true }}">
+                <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Sellos para la recompensa</span><input value="8" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              </sc-if>
+              <sc-if value="{{ mechIsPoints }}">
+                <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Puntos para la recompensa</span><input value="100" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+                <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Puntos por cada $1 de compra</span><input value="1" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              </sc-if>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Recompensa</span><input value="La 8.ª bebida es gratis" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+            </sc-if>
+            <sc-if value="{{ isPass }}">
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Vigencia del pase</span><select style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"><option>Mensual</option><option>Trimestral</option><option>Anual</option><option>Por evento</option></select></label>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Acceso incluye</span><input value="Acceso ilimitado al gimnasio" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+            </sc-if>
+
+            <div style="border-top:1px solid rgba(27,35,30,.08);padding-top:16px">
+              <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Aspecto de la tarjeta</span>
+              <div style="margin-top:12px">
+                <div style="font-size:12px;color:#6A736C;margin-bottom:8px">Color</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                  <sc-for list="{{ colorSwatches }}" as="sw" hint-placeholder-count="5">
+                    <button onClick="{{ sw.on }}" style="{{ sw.style }}"></button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:14px">
+                <div style="flex:1;border:1px dashed #C9C8BF;border-radius:10px;background:repeating-linear-gradient(45deg,#F3F2EC,#F3F2EC 5px,#EDEBE2 5px,#EDEBE2 10px);padding:16px 12px;text-align:center;cursor:pointer">
+                  <div style="font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.05em;color:#7A837C">ICONO</div>
+                  <div style="font-size:11.5px;color:#4A544D;margin-top:6px">Subir imagen</div>
+                  <div style="font-size:10px;color:#9AA39B;margin-top:2px">PNG · 512×512</div>
+                </div>
+                <div style="flex:1;border:1px dashed #C9C8BF;border-radius:10px;background:repeating-linear-gradient(45deg,#F3F2EC,#F3F2EC 5px,#EDEBE2 5px,#EDEBE2 10px);padding:16px 12px;text-align:center;cursor:pointer">
+                  <div style="font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.05em;color:#7A837C">FONDO</div>
+                  <div style="font-size:11.5px;color:#4A544D;margin-top:6px">Subir imagen</div>
+                  <div style="font-size:10px;color:#9AA39B;margin-top:2px">JPG · 1032×336</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;align-items:center;padding-top:4px">
+              <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Válido en</span>
+              <span style="font-size:12px;color:#4A544D;background:#F3F2EC;padding:4px 10px;border-radius:99px">Apple Wallet</span>
+              <span style="font-size:12px;color:#4A544D;background:#F3F2EC;padding:4px 10px;border-radius:99px">Google Wallet</span>
+            </div>
+            <button style="width:100%;padding:14px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Publicar programa</button>
+          </div>
+        </div>
+
+        <!-- live preview -->
+        <div style="flex:1 1 300px;min-width:280px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">Vista previa</div>
+          <div style="background:#F3F2EC;border:1px solid rgba(27,35,30,.1);border-radius:16px;padding:34px 26px;display:flex;justify-content:center">
+            <div style="width:100%;max-width:300px;background:{{ cardBg }};border-radius:16px;padding:20px;color:#fff;box-shadow:0 10px 26px rgba(20,27,22,.22)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#BEE6CF">{{ previewKind }}</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:18px;margin-top:3px">{{ progName }}</div></div>
+                <div style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:7px;color:#DBF0E4">QR</div>
+              </div>
+              <sc-if value="{{ previewStamps }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:9px;margin:20px 0 12px;flex-wrap:wrap">
+                  <div style="width:26px;height:26px;border-radius:50%;background:#fff"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;background:#fff"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;background:#fff"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;background:#fff"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;background:#fff"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  <div style="width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                </div>
+                <div style="font-size:12px;color:#DBF0E4">5 / 8 sellos · La 8.ª bebida es gratis</div>
+              </sc-if>
+              <sc-if value="{{ previewPoints }}">
+                <div style="display:flex;align-items:baseline;gap:6px;margin:20px 0 8px">
+                  <span style="font-family:'Newsreader',serif;font-weight:500;font-size:34px;line-height:1">60</span>
+                  <span style="font-size:13px;color:#DBF0E4">/ 100 puntos</span>
+                </div>
+                <div style="height:7px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden;margin-bottom:10px"><div style="height:100%;width:60%;background:#fff;border-radius:99px"></div></div>
+                <div style="font-size:12px;color:#DBF0E4">La 8.ª bebida es gratis · sume puntos en cada compra</div>
+              </sc-if>
+              <sc-if value="{{ isPass }}">
+                <div style="margin:20px 0 12px;font-size:13px;color:#DBF0E4">Acceso ilimitado al gimnasio</div>
+                <div style="font-size:12px;color:#BEE6CF">Vigente hasta 31 ago 2026</div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- programs + users management -->
+      <div style="display:flex;flex-wrap:wrap;gap:26px;margin-top:34px;align-items:flex-start">
+
+        <!-- active programs -->
+        <div style="flex:1.3 1 360px;min-width:300px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">B · Mis programas</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:16px;overflow:hidden">
+            <sc-for list="{{ programs }}" as="p" hint-placeholder-count="3">
+              <div style="{{ p.rowStyle }}">
+                <div style="min-width:0">
+                  <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14.5px;color:#1B231E">{{ p.name }}</div>
+                  <div style="font-size:12px;color:#9AA39B;margin-top:2px">{{ p.kind }}</div>
+                </div>
+                <span style="{{ p.badgeStyle }}">{{ p.statusLabel }}</span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                  <button style="padding:9px 13px;background:transparent;color:#1B231E;border:1px solid rgba(27,35,30,.18);border-radius:9px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;min-height:40px">Actualizar parámetros</button>
+                  <button onClick="{{ p.toggle }}" style="{{ p.toggleStyle }}">{{ p.toggleLabel }}</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- operation users -->
+        <div style="flex:1 1 300px;min-width:280px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">Usuarios de operación</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:16px;padding:20px">
+            <sc-for list="{{ opUsers }}" as="u" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(27,35,30,.07)">
+                <div style="flex:none;width:36px;height:36px;border-radius:50%;background:#F3F2EC;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;color:#1E7A50">{{ u.initials }}</div>
+                <div style="flex:1;min-width:0"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13.5px;color:#1B231E">{{ u.name }}</div><div style="font-size:11.5px;color:#9AA39B">{{ u.email }}</div></div>
+                <span style="font-size:11px;color:#4A544D;background:#F3F2EC;padding:3px 9px;border-radius:99px;white-space:nowrap">{{ u.station }}</span>
+              </div>
+            </sc-for>
+
+            <div style="margin-top:16px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Añadir usuario</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+              <input placeholder="Nombre" style="width:100%;padding:10px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:14px;color:#1B231E;background:#FFF">
+              <input placeholder="Correo" style="width:100%;padding:10px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:14px;color:#1B231E;background:#FFF">
+              <div style="display:flex;gap:10px">
+                <select style="flex:1;padding:10px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:14px;color:#1B231E;background:#FFF"><option>Caja 1</option><option>Caja 2</option><option>Puerta / acceso</option></select>
+                <input placeholder="PIN" style="width:88px;padding:10px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:14px;color:#1B231E;background:#FFF;letter-spacing:.1em">
+              </div>
+              <button onClick="{{ addUser }}" style="width:100%;padding:12px;background:#1E7A50;color:#fff;border:none;border-radius:11px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Añadir usuario</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- metrics dashboard -->
+      <div style="margin-top:36px">
+        <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:14px">C · Métricas del programa</div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:stretch">
+          <!-- hero metric -->
+          <div style="flex:1 1 300px;min-width:260px;background:#141B16;border-radius:16px;padding:26px;color:#DBE0DB">
+            <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#8FB8A2">Segundas visitas a 30 días</div>
+            <div style="font-family:'Newsreader',serif;font-weight:500;font-size:64px;line-height:1;color:#8FD1AE;margin:16px 0 8px">38%</div>
+            <p style="font-size:13.5px;line-height:1.55;color:#B7BEB8">De cada 100 clientes nuevos, 38 regresan dentro de los 30 días. <span style="color:#8FD1AE">+11 pts</span> vs. el mes anterior.</p>
+          </div>
+          <!-- metric grid -->
+          <div style="flex:2 1 420px;min-width:300px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px">
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Pases activos instalados</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:26px;color:#1B231E;margin-top:6px">842</div></div>
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Instalaciones esta semana</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:26px;color:#1E7A50;margin-top:6px">47</div><div style="font-size:11.5px;color:#9AA39B;margin-top:2px">meta ≥ 10 en 14 días</div></div>
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Visitas / canjes</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:26px;color:#1B231E;margin-top:6px">2,318</div><div style="font-size:11.5px;color:#9AA39B;margin-top:2px">96 recompensas canjeadas</div></div>
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Churn (pases eliminados)</div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:26px;color:#1B231E;margin-top:6px">9%</div><div style="font-size:11.5px;color:#9AA39B;margin-top:2px">meta &lt; 15% a 90 días</div></div>
+          </div>
+        </div>
+        <!-- notifications strip -->
+        <div style="margin-top:16px;background:#F3F2EC;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:18px 20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+          <div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Notificaciones push</div><div style="font-size:13.5px;color:#4A544D;margin-top:3px">Avise a quienes están a 1 sello de su recompensa — <span style="color:#1B231E">312 clientes</span> elegibles.</div></div>
+          <button style="padding:12px 18px;background:#1E7A50;color:#fff;border:none;border-radius:11px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Enviar recordatorio</button>
+        </div>
+      </div>
+
+      <!-- redemptions report -->
+      <div style="margin-top:36px">
+        <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:14px">D · Reporte de redenciones</div>
+        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+          <!-- table -->
+          <div style="flex:1.5 1 420px;min-width:320px">
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr .8fr;gap:8px;padding:12px 18px;background:#F3F2EC;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A837C">
+                <span>Cliente</span><span>Programa</span><span>Recompensa</span><span style="text-align:right">Fecha</span>
+              </div>
+              <sc-for list="{{ redemptions }}" as="r" hint-placeholder-count="4">
+                <div onClick="{{ r.on }}" style="{{ r.rowStyle }}">
+                  <div style="min-width:0"><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13.5px;color:#1B231E">{{ r.name }}</div><div style="font-size:11.5px;color:#9AA39B">{{ r.phone }}</div></div>
+                  <span style="font-size:12.5px;color:#4A544D;align-self:center">{{ r.program }}</span>
+                  <span style="font-size:12.5px;color:#4A544D;align-self:center">{{ r.reward }}</span>
+                  <span style="font-size:12.5px;color:#1B231E;text-align:right;align-self:center">{{ r.date }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- customer history -->
+          <div style="flex:1 1 280px;min-width:270px">
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;padding:20px">
+              <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1B231E">{{ selRed.name }}</div>
+              <div style="font-size:12.5px;color:#9AA39B;margin-top:2px">{{ selRed.program }}</div>
+
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;border-top:1px solid rgba(27,35,30,.07);margin-top:14px"><span style="color:#6A736C">Correo</span><span style="color:#1B231E">{{ selRed.email }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px"><span style="color:#6A736C">Teléfono</span><span style="color:#1B231E">{{ selRed.phone }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px"><span style="color:#6A736C">Miembro desde</span><span style="color:#1B231E">{{ selRed.since }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px"><span style="color:#6A736C">Recompensas canjeadas</span><span style="color:#1E7A50;font-family:'Instrument Sans',sans-serif;font-weight:600">{{ selRed.rewardsCount }}</span></div>
+
+              <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C;margin:18px 0 4px">Avance actual · {{ selRed.progress }}</div>
+              <div style="height:8px;border-radius:99px;background:#F3F2EC;overflow:hidden;margin-bottom:16px"><div style="height:100%;background:#1E7A50;border-radius:99px;width:{{ selRed.progressPct }}"></div></div>
+
+              <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C;margin-bottom:10px">Histórico de avance</div>
+              <sc-for list="{{ selRed.history }}" as="h" hint-placeholder-count="4">
+                <div style="display:flex;gap:11px;align-items:flex-start;padding-bottom:12px">
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:center;align-self:stretch"><span style="{{ h.dotStyle }}"></span><span style="flex:1;width:1px;background:rgba(27,35,30,.12);margin-top:2px"></span></div>
+                  <div style="padding-bottom:2px"><div style="font-size:13px;color:#1B231E">{{ h.label }}</div><div style="font-size:11px;color:#9AA39B">{{ h.date }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- birthday gift / discount cards -->
+      <div style="margin-top:36px">
+        <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:6px">E · Tarjetas de cumpleaños</div>
+        <p style="max-width:560px;font-size:13.5px;line-height:1.5;color:#6A736C;margin-bottom:16px">Emita una tarjeta de descuento o regalo única para cada cliente en su cumpleaños. Cada tarjeta lleva un código irrepetible y se añade al wallet del cliente.</p>
+
+        <div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start">
+          <!-- config form -->
+          <div style="flex:1 1 340px;min-width:300px">
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px">
+              <div>
+                <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Tipo de beneficio</span>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button onClick="{{ setGiftDiscount }}" style="{{ giftDiscountBtn }}">Descuento</button>
+                  <button onClick="{{ setGiftGift }}" style="{{ giftGiftBtn }}">Regalo</button>
+                </div>
+              </div>
+              <sc-if value="{{ giftIsDiscount }}" hint-placeholder-val="{{ true }}">
+                <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Porcentaje de descuento</span><input value="20%" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              </sc-if>
+              <sc-if value="{{ giftIsGift }}">
+                <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Regalo</span><input value="1 bebida gratis" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              </sc-if>
+              <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Vigencia (días desde el cumpleaños)</span><input value="7" style="width:100%;margin-top:6px;padding:11px 12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+              <label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer"><input type="checkbox" checked style="margin-top:2px;width:16px;height:16px;accent-color:#1E7A50"><span style="font-size:12.5px;line-height:1.45;color:#4A544D">Emitir automáticamente el día del cumpleaños de cada cliente.</span></label>
+              <button style="width:100%;padding:14px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px">Guardar automatización</button>
+            </div>
+          </div>
+
+          <!-- preview -->
+          <div style="flex:1 1 280px;min-width:270px">
+            <div style="background:#F3F2EC;border:1px solid rgba(27,35,30,.1);border-radius:16px;padding:34px 26px;display:flex;justify-content:center">
+              <div style="width:100%;max-width:300px;background:#1E7A50;border-radius:16px;padding:20px;color:#fff;box-shadow:0 10px 26px rgba(20,27,22,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <span style="background:rgba(255,255,255,.16);color:#DBF0E4;padding:4px 11px;border-radius:99px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase">Regalo de cumpleaños</span>
+                  <div style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:7px;color:#DBF0E4">QR</div>
+                </div>
+                <div style="font-family:'Newsreader',serif;font-weight:500;font-size:30px;line-height:1.1;margin:18px 0 4px">{{ giftValue }}</div>
+                <div style="font-size:12.5px;color:#DBF0E4">Para María Torres · Café Vecino</div>
+                <div style="border-top:1px solid rgba(255,255,255,.2);margin:16px 0 12px"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-family:ui-monospace,monospace;font-size:13px;letter-spacing:.06em;color:#fff">CUMPLE-3F9A</span>
+                  <span style="font-size:11px;color:#BEE6CF">Válido 7 días</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- upcoming birthdays -->
+        <div style="margin-top:20px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C;margin-bottom:10px">Cumpleaños próximos · julio</div>
+          <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.4fr .7fr 1fr .8fr auto;gap:10px;padding:12px 18px;background:#F3F2EC;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A837C;align-items:center">
+              <span>Cliente</span><span>Fecha</span><span>Código único</span><span>Estado</span><span></span>
+            </div>
+            <sc-for list="{{ birthdays }}" as="b" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:1.4fr .7fr 1fr .8fr auto;gap:10px;padding:13px 18px;border-top:1px solid rgba(27,35,30,.07);align-items:center">
+                <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13.5px;color:#1B231E">{{ b.name }}</span>
+                <span style="font-size:12.5px;color:#4A544D">{{ b.date }}</span>
+                <span style="font-family:ui-monospace,monospace;font-size:12px;color:#1E7A50;letter-spacing:.04em">{{ b.code }}</span>
+                <span><span style="{{ b.badgeStyle }}">{{ b.status }}</span></span>
+                <button onClick="{{ b.on }}" style="{{ b.btnStyle }}">{{ b.btnLabel }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ FEATURE 6 ============ -->
+    <sc-if value="{{ f6 }}">
+    <section style="animation:fadeUp .28s ease both">
+      <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#7A837C">Función 06 · Operación</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:500;font-size:clamp(27px,3.4vw,34px);line-height:1.2;color:#1B231E;letter-spacing:-.01em;margin-top:6px">Operación en tienda</h2>
+      <p style="max-width:560px;margin-top:8px;font-size:15.5px;line-height:1.55;color:#4A544D">Pantalla para el personal: escanea la tarjeta o el pase del cliente y actúa — suma sellos y canjea recompensas, o valida el acceso a una membresía (gimnasio, evento). Pensada para uso rápido y repetido.</p>
+
+      <div style="display:flex;gap:8px;margin-top:18px;max-width:360px">
+        <button onClick="{{ setOpLoyalty }}" style="{{ opLoyaltyBtn }}">Lealtad · acumular</button>
+        <button onClick="{{ setOpPass }}" style="{{ opPassBtn }}">Validar · pase</button>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:26px;margin-top:24px;align-items:flex-start">
+
+        <!-- scan -->
+        <div style="flex:1 1 320px;max-width:360px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">A · Escanear</div>
+          <div style="background:#10160F;border:1px solid rgba(27,35,30,.1);border-radius:24px;padding:26px;text-align:center">
+            <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:19px;letter-spacing:-.02em;color:#FAFAF7;display:inline-flex;align-items:flex-end;line-height:1">conpass<span style="width:5px;height:5px;border-radius:50%;background:#1E7A50;margin-left:3px;margin-bottom:2px"></span></div>
+            <div style="font-size:12px;color:#8FB8A2;margin-top:4px;margin-bottom:22px">Café Vecino · Caja 1</div>
+            <div style="position:relative;width:100%;aspect-ratio:1;border-radius:16px;background:repeating-linear-gradient(45deg,#161d15,#161d15 10px,#141b13 10px,#141b13 20px);display:flex;align-items:center;justify-content:center">
+              <div style="position:absolute;top:16px;left:16px;width:34px;height:34px;border-top:3px solid #8FD1AE;border-left:3px solid #8FD1AE;border-radius:6px 0 0 0"></div>
+              <div style="position:absolute;top:16px;right:16px;width:34px;height:34px;border-top:3px solid #8FD1AE;border-right:3px solid #8FD1AE;border-radius:0 6px 0 0"></div>
+              <div style="position:absolute;bottom:16px;left:16px;width:34px;height:34px;border-bottom:3px solid #8FD1AE;border-left:3px solid #8FD1AE;border-radius:0 0 0 6px"></div>
+              <div style="position:absolute;bottom:16px;right:16px;width:34px;height:34px;border-bottom:3px solid #8FD1AE;border-right:3px solid #8FD1AE;border-radius:0 0 6px 0"></div>
+              <div style="font-family:ui-monospace,monospace;font-size:10px;color:#5c6b5e">CÁMARA / QR</div>
+            </div>
+            <div style="font-size:14.5px;color:#DBE0DB;margin-top:20px">{{ scanPrompt }}</div>
+            <button onClick="{{ scanFound }}" style="width:100%;margin-top:16px;padding:16px;background:#1E7A50;color:#fff;border:none;border-radius:14px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;cursor:pointer;min-height:56px">Escanear</button>
+            <button style="width:100%;margin-top:10px;padding:12px;background:transparent;color:#8FD1AE;border:1px solid rgba(143,209,174,.35);border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Ingresar código manual</button>
+          </div>
+        </div>
+
+        <!-- result -->
+        <div style="flex:1 1 320px;max-width:360px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9AA39B;margin-bottom:12px">B · Cliente encontrado · gestión de acumulación</div>
+            <sc-if value="{{ opLoyalty }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+
+              <!-- B.1 · acumulación por sellos -->
+              <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:24px;padding:22px">
+                <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#9AA39B;margin-bottom:14px">B.1 · Acumulación por sellos</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:46px;height:46px;border-radius:50%;background:#F3F2EC;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1E7A50">MT</div>
+                  <div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1B231E">María Torres</div><div style="font-size:12.5px;color:#9AA39B">Club Café Vecino · por visita</div></div>
+                </div>
+                <div style="background:#1E7A50;border-radius:14px;padding:16px;color:#fff;margin-top:18px">
+                  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#fff"></div>
+                    <div style="width:22px;height:22px;border-radius:50%;background:#fff"></div>
+                    <div style="width:22px;height:22px;border-radius:50%;background:#fff"></div>
+                    <div style="width:22px;height:22px;border-radius:50%;background:#fff"></div>
+                    <div style="width:22px;height:22px;border-radius:50%;background:#fff"></div>
+                    <div style="width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                    <div style="width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                    <div style="width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85)"></div>
+                  </div>
+                  <div style="font-size:12.5px;color:#DBF0E4">5 / 8 sellos · faltan 3 para la recompensa</div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:16px">
+                  <button style="flex:1;padding:16px;background:#1E7A50;color:#fff;border:none;border-radius:13px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:52px">+ 1 sello</button>
+                  <button style="flex:1;padding:16px;background:transparent;color:#9AA39B;border:1px solid rgba(27,35,30,.16);border-radius:13px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:not-allowed;min-height:52px">Canjear · faltan 3</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;background:rgba(30,122,80,.06);border-radius:10px"><span style="color:#1E7A50">✓</span><span style="font-size:12px;color:#4A544D">1 sello = 1 visita · último +1 hace un momento</span></div>
+              </div>
+
+              <!-- B.2 · acumulación por puntos -->
+              <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:24px;padding:22px">
+                <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#9AA39B;margin-bottom:14px">B.2 · Acumulación por puntos</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:46px;height:46px;border-radius:50%;background:#F3F2EC;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1E7A50">MT</div>
+                  <div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1B231E">María Torres</div><div style="font-size:12.5px;color:#9AA39B">Club Café Vecino · por monto</div></div>
+                </div>
+                <div style="background:#1E7A50;border-radius:14px;padding:18px;color:#fff;margin-top:18px">
+                  <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px">
+                    <span style="font-family:'Newsreader',serif;font-weight:500;font-size:36px;line-height:1">60</span>
+                    <span style="font-size:14px;color:#DBF0E4">/ 100 puntos</span>
+                  </div>
+                  <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden"><div style="height:100%;width:60%;background:#fff;border-radius:99px"></div></div>
+                  <div style="font-size:12.5px;color:#DBF0E4;margin-top:10px">Faltan 40 puntos para la recompensa</div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:16px;align-items:flex-end">
+                  <label style="flex:none;width:96px"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#7A837C">Monto $</span><input value="10.00" style="width:100%;margin-top:5px;padding:12px 10px;border:1px solid rgba(27,35,30,.16);border-radius:11px;font-size:15px;color:#1B231E;background:#FFF;text-align:center"></label>
+                  <button style="flex:1;padding:16px;background:#1E7A50;color:#fff;border:none;border-radius:13px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:52px">+ 10 puntos</button>
+                </div>
+                <button style="width:100%;margin-top:10px;padding:15px;background:transparent;color:#9AA39B;border:1px solid rgba(27,35,30,.16);border-radius:13px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:not-allowed;min-height:48px">Canjear recompensa · faltan 40 pts</button>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;background:rgba(30,122,80,.06);border-radius:10px"><span style="color:#1E7A50">✓</span><span style="font-size:12px;color:#4A544D">1 punto = $1 · último +10 hace un momento</span></div>
+              </div>
+
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ opPass }}">
+            <div style="background:#FFFFFF;border:1px solid rgba(27,35,30,.1);border-radius:24px;padding:24px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:46px;height:46px;border-radius:50%;background:#F3F2EC;display:flex;align-items:center;justify-content:center;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1E7A50">CA</div>
+                <div><div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px;color:#1B231E">Carlos Andrade</div><div style="font-size:12.5px;color:#9AA39B">Pase de acceso · Gimnasio Norte</div></div>
+              </div>
+
+              <div style="background:#1E7A50;border-radius:14px;padding:18px;color:#fff;margin-top:18px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="width:9px;height:9px;border-radius:50%;background:#DBF0E4"></span>
+                  <span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px">Acceso activo</span>
+                </div>
+                <div style="font-size:12.5px;color:#DBF0E4;margin-top:8px">Membresía mensual · vigente hasta 31 ago 2026</div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px">
+                <button style="width:100%;padding:17px;background:#1E7A50;color:#fff;border:none;border-radius:14px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px;cursor:pointer;min-height:56px">Validar acceso</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:16px;padding:10px 12px;background:rgba(30,122,80,.06);border-radius:10px"><span style="color:#1E7A50">✓</span><span style="font-size:12.5px;color:#4A544D">Último: acceso validado a las 08:14</span></div>
+            </div>
+            </sc-if>
+        </div>
+
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ FEATURE 7 · LOGIN ============ -->
+    <sc-if value="{{ f7 }}">
+    <section style="animation:fadeUp .28s ease both">
+      <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#7A837C">Acceso · Cuenta</div>
+      <h2 style="font-family:'Newsreader',serif;font-weight:500;font-size:clamp(27px,3.4vw,34px);line-height:1.2;color:#1B231E;letter-spacing:-.01em;margin-top:6px">Inicio de sesión</h2>
+      <p style="max-width:560px;margin-top:8px;font-size:15.5px;line-height:1.55;color:#4A544D">Pantalla de acceso al panel de conpass — la usan tanto el dueño del comercio como el administrador de la plataforma.</p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:0;margin-top:28px;border:1px solid rgba(27,35,30,.1);border-radius:20px;overflow:hidden;max-width:900px">
+
+        <!-- editorial panel -->
+        <div style="flex:1 1 320px;min-width:280px;background:#141B16;padding:40px 36px;display:flex;flex-direction:column;justify-content:space-between;min-height:420px">
+          <div style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:22px;letter-spacing:-.02em;color:#FAFAF7;display:inline-flex;align-items:flex-end;line-height:1">conpass<span style="width:6px;height:6px;border-radius:50%;background:#1E7A50;margin-left:3px;margin-bottom:2px"></span></div>
+          <div>
+            <p style="font-family:'Newsreader',serif;font-style:italic;font-weight:500;font-size:22px;line-height:1.4;color:#FAFAF7">La tarjeta de lealtad que sus clientes ya llevan en el bolsillo.</p>
+            <p style="font-size:13.5px;line-height:1.55;color:#8FB8A2;margin-top:14px">Apple Wallet y Google Wallet. Sin apps, sin cartón.</p>
+          </div>
+        </div>
+
+        <!-- form panel -->
+        <div style="flex:1 1 360px;min-width:300px;background:#FFFFFF;padding:40px 36px;display:flex;flex-direction:column;justify-content:center">
+          <sc-if value="{{ loginIsLogin }}" hint-placeholder-val="{{ true }}">
+          <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:24px;color:#1B231E">Inicie sesión</h3>
+          <p style="font-size:13.5px;line-height:1.5;color:#6A736C;margin-top:6px">Entre a su panel para gestionar su programa.</p>
+          <div style="display:flex;flex-direction:column;gap:15px;margin-top:22px">
+            <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Correo electrónico</span><input placeholder="andres@cafevecino.ec" style="width:100%;margin-top:6px;padding:12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+            <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Contraseña</span><input type="password" placeholder="••••••••" style="width:100%;margin-top:6px;padding:12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" style="width:15px;height:15px;accent-color:#1E7A50"><span style="font-size:12.5px;color:#6A736C">Recordarme</span></label>
+              <button onClick="{{ showForgot }}" style="background:none;border:none;cursor:pointer;color:#1E7A50;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:12.5px;padding:0" style-hover="color:#145C3B">¿Olvidó su contraseña?</button>
+            </div>
+            <button style="width:100%;padding:15px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px" style-hover="background:#145C3B">Ingresar</button>
+          </div>
+          <div style="border-top:1px solid rgba(27,35,30,.1);margin:24px 0 0"></div>
+          <p style="font-size:13px;color:#6A736C;margin-top:18px;text-align:center">¿Aún no tiene cuenta? <a href="#" style="font-family:'Instrument Sans',sans-serif;font-weight:600">Cree su cuenta</a></p>
+          </sc-if>
+
+          <sc-if value="{{ loginIsForgot }}">
+          <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:24px;color:#1B231E">¿Olvidó su contraseña?</h3>
+          <p style="font-size:13.5px;line-height:1.5;color:#6A736C;margin-top:6px">Ingrese el correo de su cuenta y le enviaremos un código de verificación.</p>
+          <div style="display:flex;flex-direction:column;gap:15px;margin-top:22px">
+            <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Correo de la cuenta</span><input placeholder="andres@cafevecino.ec" style="width:100%;margin-top:6px;padding:12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+            <button onClick="{{ sendCode }}" style="width:100%;padding:15px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px" style-hover="background:#145C3B">Enviar código</button>
+          </div>
+          <p style="font-size:13px;color:#6A736C;margin-top:18px;text-align:center"><button onClick="{{ backToLogin }}" style="background:none;border:none;cursor:pointer;color:#1E7A50;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;padding:0">Volver a iniciar sesión</button></p>
+          </sc-if>
+
+          <sc-if value="{{ loginIsSent }}">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(30,122,80,.1);color:#1E7A50;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px">✓</div>
+          <h3 style="font-family:'Newsreader',serif;font-weight:500;font-size:24px;color:#1B231E">Revise su correo</h3>
+          <p style="font-size:13.5px;line-height:1.5;color:#6A736C;margin-top:6px">Enviamos un código de 6 dígitos a <span style="color:#1B231E">andres@cafevecino.ec</span>. Ingréselo y defina su nueva contraseña.</p>
+          <div style="display:flex;flex-direction:column;gap:15px;margin-top:22px">
+            <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Código de verificación</span><input placeholder="0 0 0 0 0 0" style="width:100%;margin-top:6px;padding:12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:17px;color:#1B231E;background:#FFF;letter-spacing:.35em;text-align:center"></label>
+            <label style="display:block"><span style="font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#7A837C">Nueva contraseña</span><input type="password" placeholder="••••••••" style="width:100%;margin-top:6px;padding:12px;border:1px solid rgba(27,35,30,.16);border-radius:10px;font-size:15px;color:#1B231E;background:#FFF"></label>
+            <button onClick="{{ backToLogin }}" style="width:100%;padding:15px;background:#1E7A50;color:#fff;border:none;border-radius:12px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;min-height:44px" style-hover="background:#145C3B">Restablecer contraseña</button>
+          </div>
+          <p style="font-size:13px;color:#6A736C;margin-top:18px;text-align:center">¿No lo recibió? <button onClick="{{ sendCode }}" style="background:none;border:none;cursor:pointer;color:#1E7A50;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;padding:0">Reenviar código</button></p>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    active: 1,
+    selId: 0,
+    detailPlan: 'Growth',
+    detailStatus: 'Al día',
+    progType: 'loyalty',
+    opMode: 'loyalty',
+    codeValid: false,
+    signupMode: 'loyalty',
+    loyaltyMech: 'stamps',
+    cardColor: '#1E7A50',
+    programs: [
+      { id: 'loy', name: 'Club Café Vecino', kind: 'Tarjeta de lealtad · 8 sellos', active: true },
+      { id: 'gym', name: 'Pase Gimnasio Norte', kind: 'Pase de acceso · mensual', active: true },
+      { id: 'evt', name: 'Entrada Feria Verano', kind: 'Entrada de evento', active: false },
+    ],
+    opUsers: [
+      { name: 'Lucía Mora', email: 'lucia@cafevecino.ec', station: 'Caja 1' },
+      { name: 'Diego Ruiz', email: 'diego@cafevecino.ec', station: 'Caja 2' },
+    ],
+    loginMode: 'login',
+    selRed: 0,
+    payMethod: 'card',
+    giftType: 'discount',
+    birthdays: [
+      { id: 'b1', name: 'María Torres', date: '14 jul', code: 'CUMPLE-3F9A', sent: false },
+      { id: 'b2', name: 'Luis Paredes', date: '19 jul', code: 'CUMPLE-8B2C', sent: true },
+      { id: 'b3', name: 'Sofía León', date: '23 jul', code: 'CUMPLE-6K1D', sent: false },
+      { id: 'b4', name: 'Ana Castro', date: '28 jul', code: 'CUMPLE-9Z4E', sent: false },
+    ],
+  };
+
+  redemptionsData = [
+    {
+      name: 'María Torres', email: 'maria@correo.com', phone: '+593 99 123 4567',
+      program: 'Club Café Vecino', reward: 'Bebida gratis', date: '10 jul 2026',
+      since: 'May 2026', rewardsCount: 2, progress: '8 / 8 sellos', progressPct: '100%',
+      history: [
+        { label: 'Recompensa canjeada · bebida gratis', date: '10 jul 2026' },
+        { label: '8.º sello — recompensa completa', date: '10 jul 2026' },
+        { label: '+3 sellos en 2 visitas', date: '2–8 jul 2026' },
+        { label: 'Registro y primera visita', date: '02 may 2026' },
+      ],
+    },
+    {
+      name: 'Jorge Salas', email: 'jorge@correo.com', phone: '+593 98 555 2211',
+      program: 'Club Café Vecino', reward: 'Bebida gratis', date: '08 jul 2026',
+      since: 'Abr 2026', rewardsCount: 1, progress: '3 / 8 sellos', progressPct: '38%',
+      history: [
+        { label: 'Recompensa canjeada · bebida gratis', date: '08 jul 2026' },
+        { label: 'Reinició tarjeta · +3 sellos', date: 'jul 2026' },
+        { label: 'Registro', date: '19 abr 2026' },
+      ],
+    },
+    {
+      name: 'Ana Castro', email: 'ana@correo.com', phone: '+593 96 447 8890',
+      program: 'Club Café Vecino', reward: 'Postre gratis', date: '05 jul 2026',
+      since: 'Mar 2026', rewardsCount: 3, progress: '6 / 8 sellos', progressPct: '75%',
+      history: [
+        { label: 'Recompensa canjeada · postre gratis', date: '05 jul 2026' },
+        { label: '+6 sellos acumulados', date: 'jun–jul 2026' },
+        { label: 'Registro', date: '11 mar 2026' },
+      ],
+    },
+    {
+      name: 'Pedro Vaca', email: 'pedro@correo.com', phone: '+593 99 002 3344',
+      program: 'Club Café Vecino', reward: 'Bebida gratis', date: '01 jul 2026',
+      since: 'Feb 2026', rewardsCount: 4, progress: '1 / 8 sellos', progressPct: '13%',
+      history: [
+        { label: 'Recompensa canjeada · bebida gratis', date: '01 jul 2026' },
+        { label: 'Reinició tarjeta · +1 sello', date: 'jul 2026' },
+        { label: 'Registro', date: '07 feb 2026' },
+      ],
+    },
+  ];
+
+  colorOptions = ['#1E7A50', '#1B231E', '#2F5D8C', '#8A3B4C', '#B07B2E'];
+
+  navItems = [
+    { n: '01', t: 'Registro cliente' },
+    { n: '02', t: 'Suscripción B2B' },
+    { n: '03', t: 'Email bienvenida' },
+    { n: '04', t: 'Admin plataforma' },
+    { n: '05', t: 'Panel comercio' },
+    { n: '06', t: 'Operación tienda' },
+    { n: '07', t: 'Inicio de sesión' },
+  ];
+
+  clientsData = [
+    { name: 'Café Vecino', city: 'Quito', plan: 'Growth', status: 'Al día', mrr: '$49', since: 'Ene 2026', next: '01 ago 2026', last: '01 jul 2026' },
+    { name: 'Gimnasio Norte', city: 'Guayaquil', plan: 'Growth', status: 'Al día', mrr: '$49', since: 'Feb 2026', next: '05 ago 2026', last: '05 jul 2026' },
+    { name: 'Barbería Central', city: 'Cuenca', plan: 'Starter', status: 'Vencido', mrr: '$19', since: 'Mar 2026', next: '28 jun 2026', last: '28 may 2026' },
+    { name: 'Yoga Estudio', city: 'Quito', plan: 'Starter', status: 'Prueba', mrr: '$0', since: 'Jul 2026', next: '19 jul 2026', last: '—' },
+    { name: 'Panadería Sol', city: 'Ambato', plan: 'Growth', status: 'Al día', mrr: '$49', since: 'Abr 2026', next: '11 ago 2026', last: '11 jul 2026' },
+    { name: 'Eventos Andes', city: 'Guayaquil', plan: 'Starter', status: 'Al día', mrr: '$19', since: 'May 2026', next: '22 jul 2026', last: '22 jun 2026' },
+  ];
+
+  badgeStyle(status) {
+    const base = "font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;padding:3px 10px;border-radius:99px;white-space:nowrap;";
+    if (status === 'Al día') return base + 'background:rgba(30,122,80,.1);color:#1E7A50';
+    if (status === 'Vencido') return base + 'background:rgba(180,70,46,.12);color:#B4462E';
+    return base + 'background:#F3F2EC;color:#7A837C';
+  }
+
+  renderVals() {
+    const a = this.state.active;
+    const nav = this.navItems.map((item, i) => {
+      const on = i + 1 === a;
+      return {
+        n: item.n,
+        t: item.t,
+        on: () => this.setState({ active: i + 1 }),
+        style: "display:flex;align-items:center;gap:7px;border:none;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;padding:8px 13px;border-radius:99px;transition:background .15s;" + (on ? 'background:#1B231E;color:#FAFAF7' : 'background:transparent;color:#6A736C'),
+        numStyle: "font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;" + (on ? 'color:#8FD1AE' : 'color:#9AA39B'),
+      };
+    });
+
+    // F4 clients
+    const clients = this.clientsData.map((c, i) => {
+      const isSel = i === this.state.selId;
+      return {
+        ...c,
+        on: () => this.setState({ selId: i, detailPlan: c.plan, detailStatus: c.status }),
+        rowStyle: 'display:grid;grid-template-columns:1.6fr .8fr 1fr .8fr;gap:8px;padding:13px 18px;cursor:pointer;border-top:1px solid rgba(27,35,30,.07);transition:background .12s;' + (isSel ? 'background:rgba(30,122,80,.055)' : 'background:#FFF'),
+        badgeStyle: this.badgeStyle(c.status),
+      };
+    });
+
+    const selBase = this.clientsData[this.state.selId];
+    const sel = { ...selBase, plan: this.state.detailPlan, status: this.state.detailStatus, badgeStyle: this.badgeStyle(this.state.detailStatus) };
+
+    const planBtn = (active) => "flex:1;padding:11px;border-radius:10px;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;min-height:44px;" + (active ? 'background:#1B231E;color:#FAFAF7;border:1px solid #1B231E' : 'background:#FFF;color:#4A544D;border:1px solid rgba(27,35,30,.18)');
+
+    // F5 program type
+    const isLoyalty = this.state.progType === 'loyalty';
+    const mechStamps = this.state.loyaltyMech === 'stamps';
+    const suLoyalty = this.state.signupMode === 'loyalty';
+    const typeBtn = (active) => "flex:1;padding:11px;border-radius:10px;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;min-height:44px;" + (active ? 'background:#1E7A50;color:#fff;border:1px solid #1E7A50' : 'background:#FFF;color:#4A544D;border:1px solid rgba(27,35,30,.18)');
+
+    return {
+      nav,
+      f1: a === 1, f2: a === 2, f3: a === 3, f4: a === 4, f5: a === 5, f6: a === 6, f7: a === 7,
+
+      // F1 signup mode (loyalty card vs membership pass)
+      signupLoyaltyBtn: typeBtn(suLoyalty),
+      signupPassBtn: typeBtn(!suLoyalty),
+      setSignupLoyalty: () => this.setState({ signupMode: 'loyalty' }),
+      setSignupPass: () => this.setState({ signupMode: 'pass' }),
+      su1Heading: suLoyalty ? 'Reciba su tarjeta de lealtad' : 'Active su pase de membresía',
+      su1Sub: suLoyalty
+        ? (mechStamps ? 'Complete sus datos y añádala a su wallet. Junte sellos en cada visita.' : 'Complete sus datos y añádala a su wallet. Sume puntos en cada compra.')
+        : 'Complete sus datos y valide su código para añadir su pase de membresía al wallet.',
+      su1DoneTitle: suLoyalty ? '¡Su tarjeta está lista!' : '¡Su pase está listo!',
+      su1DoneSub: suLoyalty
+        ? (mechStamps ? 'Añádala a su wallet para empezar a sumar sellos en cada visita.' : 'Añádala a su wallet para empezar a sumar puntos en cada compra.')
+        : 'Añádalo a su wallet para validar su acceso en cada visita.',
+      su1LoyaltyStamps: suLoyalty && mechStamps,
+      su1LoyaltyPoints: suLoyalty && !mechStamps,
+      su1Pass: !suLoyalty,
+
+      // F5 loyalty mechanic (stamps vs points) — shared with F1 & F6
+      mechIsStamps: mechStamps,
+      mechIsPoints: !mechStamps,
+      mechStampsBtn: typeBtn(mechStamps),
+      mechPointsBtn: typeBtn(!mechStamps),
+      setMechStamps: () => this.setState({ loyaltyMech: 'stamps' }),
+      setMechPoints: () => this.setState({ loyaltyMech: 'points' }),
+      previewStamps: isLoyalty && mechStamps,
+      previewPoints: isLoyalty && !mechStamps,
+
+      // F6 operation loyalty mechanic
+      opStamps: this.state.opMode === 'loyalty' && mechStamps,
+      opPoints: this.state.opMode === 'loyalty' && !mechStamps,
+
+      // F5 birthday gift cards
+      giftIsDiscount: this.state.giftType === 'discount',
+      giftIsGift: this.state.giftType === 'gift',
+      giftDiscountBtn: typeBtn(this.state.giftType === 'discount'),
+      giftGiftBtn: typeBtn(this.state.giftType === 'gift'),
+      setGiftDiscount: () => this.setState({ giftType: 'discount' }),
+      setGiftGift: () => this.setState({ giftType: 'gift' }),
+      giftValue: this.state.giftType === 'discount' ? '20% de descuento' : '1 bebida gratis',
+      birthdays: this.state.birthdays.map((b) => {
+        const badge = "font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;padding:3px 10px;border-radius:99px;white-space:nowrap;";
+        return {
+          name: b.name, date: b.date, code: b.code,
+          status: b.sent ? 'Enviada' : 'Programada',
+          badgeStyle: badge + (b.sent ? 'background:rgba(30,122,80,.1);color:#1E7A50' : 'background:#F3F2EC;color:#7A837C'),
+          on: () => this.setState({ birthdays: this.state.birthdays.map((x) => x.id === b.id ? { ...x, sent: true } : x) }),
+          btnLabel: b.sent ? 'Reenviar' : 'Emitir',
+          btnStyle: 'padding:9px 15px;border-radius:9px;font-family:\'Instrument Sans\',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;min-height:40px;white-space:nowrap;' + (b.sent ? 'background:transparent;color:#1B231E;border:1px solid rgba(27,35,30,.18)' : 'background:#1E7A50;color:#fff;border:none'),
+        };
+      }),
+
+      // F2 payment method
+      payIsCard: this.state.payMethod === 'card',
+      payIsDeuna: this.state.payMethod === 'deuna',
+      payCardBtn: typeBtn(this.state.payMethod === 'card'),
+      payDeunaBtn: typeBtn(this.state.payMethod === 'deuna'),
+      setPayCard: () => this.setState({ payMethod: 'card' }),
+      setPayDeuna: () => this.setState({ payMethod: 'deuna' }),
+      payCta: this.state.payMethod === 'deuna' ? 'Enviar comprobante y activar' : 'Activar mi cuenta',
+
+      // F7 login modes
+      loginIsLogin: this.state.loginMode === 'login',
+      loginIsForgot: this.state.loginMode === 'forgot',
+      loginIsSent: this.state.loginMode === 'sent',
+      showForgot: () => this.setState({ loginMode: 'forgot' }),
+      sendCode: () => this.setState({ loginMode: 'sent' }),
+      backToLogin: () => this.setState({ loginMode: 'login' }),
+
+      // F5 redemptions
+      redemptions: this.redemptionsData.map((r, i) => ({
+        name: r.name, phone: r.phone, program: r.program, reward: r.reward, date: r.date,
+        on: () => this.setState({ selRed: i }),
+        rowStyle: 'display:grid;grid-template-columns:1.4fr 1.2fr 1fr .8fr;gap:8px;padding:13px 18px;cursor:pointer;border-top:1px solid rgba(27,35,30,.07);transition:background .12s;' + (i === this.state.selRed ? 'background:rgba(30,122,80,.055)' : 'background:#FFF'),
+      })),
+      selRed: (() => {
+        const r = this.redemptionsData[this.state.selRed];
+        return {
+          ...r,
+          history: r.history.map((h) => ({ ...h, dotStyle: 'flex:none;width:9px;height:9px;border-radius:50%;background:#1E7A50;margin-top:4px' })),
+        };
+      })(),
+
+      // F1 access code
+      codeValid: this.state.codeValid,
+      validateCode: () => this.setState({ codeValid: !this.state.codeValid }),
+      validateLabel: this.state.codeValid ? 'Válido' : 'Validar',
+      validateBtn: "padding:11px 14px;border-radius:10px;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:13px;white-space:nowrap;min-height:44px;" + (this.state.codeValid ? 'background:rgba(30,122,80,.1);color:#1E7A50;border:1px solid rgba(30,122,80,.3)' : 'background:#1B231E;color:#FAFAF7;border:none'),
+
+      // F4
+      clients,
+      sel,
+      starterBtn: planBtn(this.state.detailPlan === 'Starter'),
+      growthBtn: planBtn(this.state.detailPlan === 'Growth'),
+      setStarter: () => this.setState({ detailPlan: 'Starter' }),
+      setGrowth: () => this.setState({ detailPlan: 'Growth' }),
+      markPaid: () => this.setState({ detailStatus: 'Al día' }),
+
+      // F5
+      isLoyalty,
+      isPass: !isLoyalty,
+      loyaltyBtn: typeBtn(isLoyalty),
+      passBtn: typeBtn(!isLoyalty),
+      setLoyalty: () => this.setState({ progType: 'loyalty' }),
+      setPass: () => this.setState({ progType: 'pass' }),
+      progName: isLoyalty ? 'Club Café Vecino' : 'Pase Gimnasio Norte',
+      previewKind: isLoyalty ? 'Tarjeta de lealtad' : 'Pase de acceso',
+      cardBg: this.state.cardColor,
+      colorSwatches: this.colorOptions.map((hex) => ({
+        on: () => this.setState({ cardColor: hex }),
+        style: 'width:30px;height:30px;border-radius:50%;border:1px solid rgba(27,35,30,.15);cursor:pointer;background:' + hex + ';' + (this.state.cardColor === hex ? 'outline:2px solid #1B231E;outline-offset:2px' : ''),
+      })),
+      programs: this.state.programs.map((p) => {
+        const badge = "font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:11px;padding:3px 10px;border-radius:99px;white-space:nowrap;align-self:center;";
+        return {
+          name: p.name,
+          kind: p.kind,
+          rowStyle: 'display:grid;grid-template-columns:1.4fr auto auto;gap:12px;align-items:center;padding:14px 18px;border-top:1px solid rgba(27,35,30,.07);' + (p.active ? '' : 'opacity:.62'),
+          statusLabel: p.active ? 'Activo' : 'Inactivo',
+          badgeStyle: badge + (p.active ? 'background:rgba(30,122,80,.1);color:#1E7A50' : 'background:#F3F2EC;color:#7A837C'),
+          toggle: () => this.setState({ programs: this.state.programs.map((x) => x.id === p.id ? { ...x, active: !x.active } : x) }),
+          toggleLabel: p.active ? 'Inactivar' : 'Activar',
+          toggleStyle: 'padding:9px 13px;border-radius:9px;font-family:\'Instrument Sans\',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer;min-height:40px;' + (p.active ? 'background:transparent;color:#B4462E;border:1px solid rgba(180,70,46,.3)' : 'background:#1E7A50;color:#fff;border:none'),
+        };
+      }),
+      opUsers: this.state.opUsers.map((u) => ({
+        ...u,
+        initials: u.name.split(' ').map((w) => w[0]).slice(0, 2).join(''),
+      })),
+      addUser: () => this.setState({ opUsers: [...this.state.opUsers, { name: 'Nuevo usuario', email: 'usuario@cafevecino.ec', station: 'Caja 1' }] }),
+
+      // F6
+      opLoyalty: this.state.opMode === 'loyalty',
+      opPass: this.state.opMode === 'pass',
+      opLoyaltyBtn: typeBtn(this.state.opMode === 'loyalty'),
+      opPassBtn: typeBtn(this.state.opMode === 'pass'),
+      setOpLoyalty: () => this.setState({ opMode: 'loyalty' }),
+      setOpPass: () => this.setState({ opMode: 'pass' }),
+      scanPrompt: this.state.opMode === 'loyalty' ? 'Escanee la tarjeta del cliente' : 'Escanee el pase del cliente',
+      scanFound: () => {},
+    };
+  }
+}
+</script>
+</body>
+</html>
