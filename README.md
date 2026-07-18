@@ -17,6 +17,7 @@ Both apps share **one Supabase database** (Postgres + Auth + Storage + RLS).
 
 ## Contents
 
+- **[STATUS.md](STATUS.md) — live build status & phase progress.**
 - [DECISIONS.md](DECISIONS.md) — fixed architecture & domain decisions.
 - [BUILD-PLAN.md](BUILD-PLAN.md) — phases, multi-agent workflow, credential gates.
 - [aws/](aws) — least-privilege IAM policies + the [deploy runbook](aws/DEPLOY.md).
