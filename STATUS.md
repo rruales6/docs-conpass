@@ -23,7 +23,7 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | **1 — Foundations** | ✅ Done | Contracts (OpenAPI 3.1), DB schema + RLS + Data-API grants, shared `conpass_common` layer, 10 SRP Lambdas, Serverless v3 infra, codegen, CI. |
 | **2 — Auth + tenancy** | ✅ Done, deployed, verified live | Supabase Auth: owner login provisioned on onboarding (temp password, Función 03), operation-user creation (tier-limited), `/me` resolves roles/tenant from the JWT, asymmetric JWKS verification, RLS tenant isolation. Verified end-to-end through the deployed API with a real token. |
 | **3 — Core domain** | ✅ Done, verified live | Programs CRUD (tier-limited), customer enrollment / card issuance (opaque QR token, dedupe, welcome bonus), in-store operations (accrue / redeem / validate) with idempotency + fraud window, card read. |
-| **4 — Google Wallet** | ✅ Done, verified live (not yet deployed) | `GoogleWalletProvider` (Generic passes, REST + signed save-link) — zero new deps (PyJWT + httpx). Wired: enrollment issues a pass + returns the "Add to Google Wallet" link (best-effort — never fails enrollment), `GET /cards/{id}/wallet-links`, `POST /operations/resolve` (cashier hydrate), and accrue/redeem reflect balances into the pass best-effort. Proven end-to-end against the real Google Wallet API + live Supabase (issue → update → revoke, self-cleaning). Provider abstraction stays Apple-ready. **Redeploy pending.** |
+| **4 — Google Wallet** | ✅ Done, deployed, verified live | `GoogleWalletProvider` (Generic passes, REST + signed save-link) — zero new deps (PyJWT + httpx). Wired: enrollment issues a pass + returns the "Add to Google Wallet" link (best-effort — never fails enrollment), `GET /cards/{id}/wallet-links`, `POST /operations/resolve` (cashier hydrate), and accrue/redeem reflect balances into the pass best-effort. Proven end-to-end against the real Google Wallet API + live Supabase (issue → update → revoke, self-cleaning). **Deployed to prod (`--force`, 2026-07-18)** — Lambdas carry the SA-JSON env; `/operations/resolve` + `/cards/{id}/wallet-links` live. Provider abstraction stays Apple-ready. |
 | **5 — Unified PWA** | 🟡 In progress | Deployed. Wired to live API: onboarding → activation, login → role redirect, customer enrollment. Remaining screens (merchant panel, cashier scan, admin) render but not yet wired. |
 | **6 — Admin + stubs** | ⏳ Pending | Payment + messaging providers stubbed (by design). Platform-admin, program metrics, birthday automation, notifications endpoints return `501`. |
 | **7 — Efficiency review + hardening** | ⏳ Pending | Incl. re-slimming the deps layer, optional Lambda authorizer at the edge, SnapStart eval. |
@@ -32,11 +32,9 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 
 **Live:** `GET /health`, `GET /me`, `POST /merchants`, `GET /merchants/{id}`,
 `GET|POST /merchants/{id}/operation-users`, `GET|POST /programs`,
-`GET|PATCH /programs/{id}`, `POST /programs/{id}/enroll`, `GET /cards/{id}`,
-`POST /operations/{accrue,redeem,validate-access}`.
-
-**Code-complete, redeploy pending (P4):** `POST /operations/resolve`,
-`GET /cards/{id}/wallet-links`, and wallet links on `POST /programs/{id}/enroll`.
+`GET|PATCH /programs/{id}`, `POST /programs/{id}/enroll` (+ Google Wallet link),
+`GET /cards/{id}`, `GET /cards/{id}/wallet-links`,
+`POST /operations/{accrue,redeem,validate-access,resolve}`.
 
 **Stubbed `501` (by phase):** `GET /programs/{id}/metrics` (P6),
 `GET /programs/{id}/redemptions` (P3/UI hydrate),
@@ -53,7 +51,7 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | Merchant login → role-based routing | ✅ (`/me` roles) | ✅ working |
 | Create program (authed) | ✅ verified w/ real token | 🟡 panel screen not wired |
 | In-store accrue / redeem / validate | ✅ verified | 🟡 cashier screen not wired |
-| Add to Google Wallet | ✅ verified live (issue/update/revoke) | ⏳ redeploy + wire button |
+| Add to Google Wallet | ✅ live on prod API (issue/update/revoke) | ⏳ wire the "Add" button |
 | Add to Apple Wallet | ❌ future (abstraction ready) | ❌ future |
 
 ## Quality
@@ -61,8 +59,11 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
 
 ## Known follow-ups
-- **Redeploy backend** to make Phase 4 endpoints live (`scripts/deploy.sh conpass prod`).
-- Wire the PWA "Add to Google Wallet" button + remaining screens (merchant panel, cashier, admin) — pairs with P6.
+- Wire the PWA "Add to Google Wallet" button (link is in the enroll response +
+  `GET /cards/{id}/wallet-links`) + remaining screens (merchant panel, cashier, admin) — pairs with P6.
+- P7: move the cashier-path wallet push (`operations` accrue/redeem) to async
+  (SQS/EventBridge) — today it's synchronous best-effort, a slow Google call could
+  brush the <3s cashier budget (never fails the op).
 - P7: pass logo/background images (need public Supabase Storage URLs; currently omitted).
 - Enrollment route param is named `:merchantSlug` but carries the `programId` (works; rename for clarity).
 - Deps layer un-slimmed (`slim:false`) to keep `email-validator` metadata — re-slim in P7.
