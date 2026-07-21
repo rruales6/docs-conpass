@@ -24,7 +24,7 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | **2 — Auth + tenancy** | ✅ Done, deployed, verified live | Supabase Auth: owner login provisioned on onboarding (temp password, Función 03), operation-user creation (tier-limited), `/me` resolves roles/tenant from the JWT, asymmetric JWKS verification, RLS tenant isolation. Verified end-to-end through the deployed API with a real token. |
 | **3 — Core domain** | ✅ Done, verified live | Programs CRUD (tier-limited), customer enrollment / card issuance (opaque QR token, dedupe, welcome bonus), in-store operations (accrue / redeem / validate) with idempotency + fraud window, card read. |
 | **4 — Google Wallet** | ✅ Done, deployed, verified live | `GoogleWalletProvider` (Generic passes, REST + signed save-link) — zero new deps (PyJWT + httpx). Wired: enrollment issues a pass + returns the "Add to Google Wallet" link (best-effort — never fails enrollment), `GET /cards/{id}/wallet-links`, `POST /operations/resolve` (cashier hydrate), and accrue/redeem reflect balances into the pass best-effort. Proven end-to-end against the real Google Wallet API + live Supabase (issue → update → revoke, self-cleaning). **Deployed to prod (`--force`, 2026-07-18)** — Lambdas carry the SA-JSON env; `/operations/resolve` + `/cards/{id}/wallet-links` live. Provider abstraction stays Apple-ready. |
-| **5 — Unified PWA** | 🟡 Mostly done, deployed | Wired to live API: onboarding → activation, login → role redirect, customer enrollment (+ working "Add to Google Wallet" button), **cashier scan → resolve → accrue/redeem** (html5-qrcode camera + manual entry, offline-queued & idempotent, optimistic balance), and **merchant panel** program create/list + per-program enroll link (copy). Admin dashboard + panel **metrics** stay placeholders until their backends ship (Phase 6, `501`). Rebuilt (Node 20) + deployed to the CloudFront test host. |
+| **5 — Unified PWA** | 🟡 Mostly done, deployed | Wired to live API: onboarding → activation, login → role redirect, customer enrollment (+ working "Add to Google Wallet" button), **cashier scan → resolve → accrue/redeem** (html5-qrcode camera + manual entry, offline-queued & idempotent, stage-then-confirm stamp batching), and **merchant panel** program create/list + per-program enroll link (copy). Admin dashboard + panel **metrics** stay placeholders until their backends ship (Phase 6, `501`). Plus a **public self-serve `/demo` sandbox**: `GET /demo` returns the most-recent `is_demo` tenant + shared test creds, the PWA silently signs in and reuses the real enroll/panel/cashier journeys under `/demo/*` (verified live). Rebuilt (Node 20) + deployed to the CloudFront test host. |
 | **6 — Admin + stubs** | ⏳ Pending | Payment + messaging providers stubbed (by design). Platform-admin, program metrics, birthday automation, notifications endpoints return `501`. |
 | **7 — Efficiency review + hardening** | ⏳ Pending | Incl. re-slimming the deps layer, optional Lambda authorizer at the edge, SnapStart eval. |
 
@@ -59,6 +59,14 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
 
 ## Known follow-ups
+- **PWA service worker serves a stale bundle on the first navigation after a deploy**
+  (a returning visitor hit `/demo` → 404 until one reload, then it self-healed). Consider
+  network-first navigation for `index.html` or a "new version — refresh" prompt.
+- **`scripts/apply_migrations.py` recorded 0006 as applied but did NOT add the column**
+  (had to apply the DDL directly). Migration runner may be silently no-op'ing DDL while
+  marking migrations done — investigate before the next migration.
+- Demo data: run `backend/scripts/reset_demo.py` to wipe sandbox activity; wire a nightly
+  scheduled reset later. Demo creds: `demo-owner@conpass.cards` / `conpass-demo-2026`.
 - Wire the PWA "Add to Google Wallet" button (link is in the enroll response +
   `GET /cards/{id}/wallet-links`) + remaining screens (merchant panel, cashier, admin) — pairs with P6.
 - P7: move the cashier-path wallet push (`operations` accrue/redeem) to async
