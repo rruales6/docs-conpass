@@ -58,13 +58,19 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 27 tests pass (unit + live integration against real Supabase **and** real Google Wallet),
 ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
 
+## Recently fixed
+- **PWA stale-bundle after deploy** — SW now serves document navigations **network-first**
+  (`vite.config.ts`: `navigateFallback: null` + a `conpass-app-shell` NetworkFirst rule),
+  so a hard load / deep link always fetches the current bundle. Verified: `/demo` loads
+  fresh on first load. (Applies going forward once each client picks up this SW.)
+- **`apply_migrations.py` silently rolled back every migration** — root cause: a trailing
+  `SELECT` on a non-autocommit connection left a txn open, so each `with conn.transaction()`
+  became a savepoint that never top-level committed and `close()` rolled it all back (while
+  printing "applied"). Fixed: `autocommit=True`, force session port 5432 (not the 6543 txn
+  pooler), correct pooler user/ref. Verified persistence with a throwaway migration; all 6
+  migrations now tracked.
+
 ## Known follow-ups
-- **PWA service worker serves a stale bundle on the first navigation after a deploy**
-  (a returning visitor hit `/demo` → 404 until one reload, then it self-healed). Consider
-  network-first navigation for `index.html` or a "new version — refresh" prompt.
-- **`scripts/apply_migrations.py` recorded 0006 as applied but did NOT add the column**
-  (had to apply the DDL directly). Migration runner may be silently no-op'ing DDL while
-  marking migrations done — investigate before the next migration.
 - Demo data: run `backend/scripts/reset_demo.py` to wipe sandbox activity; wire a nightly
   scheduled reset later. Demo creds: `demo-owner@conpass.cards` / `conpass-demo-2026`.
 - Wire the PWA "Add to Google Wallet" button (link is in the enroll response +
