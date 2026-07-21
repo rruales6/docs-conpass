@@ -25,22 +25,21 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | **3 — Core domain** | ✅ Done, verified live | Programs CRUD (tier-limited), customer enrollment / card issuance (opaque QR token, dedupe, welcome bonus), in-store operations (accrue / redeem / validate) with idempotency + fraud window, card read. |
 | **4 — Google Wallet** | ✅ Done, deployed, verified live | `GoogleWalletProvider` (Generic passes, REST + signed save-link) — zero new deps (PyJWT + httpx). Wired: enrollment issues a pass + returns the "Add to Google Wallet" link (best-effort — never fails enrollment), `GET /cards/{id}/wallet-links`, `POST /operations/resolve` (cashier hydrate), and accrue/redeem reflect balances into the pass best-effort. Proven end-to-end against the real Google Wallet API + live Supabase (issue → update → revoke, self-cleaning). **Deployed to prod (`--force`, 2026-07-18)** — Lambdas carry the SA-JSON env; `/operations/resolve` + `/cards/{id}/wallet-links` live. Provider abstraction stays Apple-ready. |
 | **5 — Unified PWA** | 🟡 Mostly done, deployed | Wired to live API: onboarding → activation, login → role redirect, customer enrollment (+ working "Add to Google Wallet" button), **cashier scan → resolve → accrue/redeem** (html5-qrcode camera + manual entry, offline-queued & idempotent, stage-then-confirm stamp batching), and **merchant panel** program create/list + per-program enroll link (copy). Admin dashboard + panel **metrics** stay placeholders until their backends ship (Phase 6, `501`). Plus a **public self-serve `/demo` sandbox**: `GET /demo` returns the most-recent `is_demo` tenant + shared test creds, the PWA silently signs in and reuses the real enroll/panel/cashier journeys under `/demo/*` (verified live). Rebuilt (Node 20) + deployed to the CloudFront test host. |
-| **6 — Admin + stubs** | ⏳ Pending | Payment + messaging providers stubbed (by design). Platform-admin, program metrics, birthday automation, notifications endpoints return `501`. |
+| **6 — Admin + stubs** | 🟡 Core done, deployed, verified live | **Program metrics** (`GET /programs/{id}/metrics` via `program_metrics_view` — active passes ≈ active cards, wallet-saved callback deferred), **redemptions report** (`GET /programs/{id}/redemptions`), and **platform-admin** (`GET /admin/{clients,stats}` + `PATCH /admin/clients/{id}/subscription` = manual payment activation). Frontend: admin dashboard (stats + client list + confirm-payment) and panel metrics + redemptions wired. Verified end-to-end live (admin token + browser). Payment/messaging **providers stay stubbed** (by design). **Deferred**: birthday automation + `POST /notifications/reminders` (still `501`). Test account: `platform_admin` seeded (`scripts/seed_admin.py`). |
 | **7 — Efficiency review + hardening** | ⏳ Pending | Incl. re-slimming the deps layer, optional Lambda authorizer at the edge, SnapStart eval. |
 
 ## Endpoint status (deployed API)
 
-**Live:** `GET /health`, `GET /me`, `POST /merchants`, `GET /merchants/{id}`,
+**Live:** `GET /health`, `GET /me`, `GET /demo`, `POST /merchants`, `GET /merchants/{id}`,
 `GET|POST /merchants/{id}/operation-users`, `GET|POST /programs`,
-`GET|PATCH /programs/{id}`, `POST /programs/{id}/enroll` (+ Google Wallet link),
+`GET|PATCH /programs/{id}`, `GET /programs/{id}/metrics`, `GET /programs/{id}/redemptions`,
+`POST /programs/{id}/enroll` (+ Google Wallet link),
 `GET /cards/{id}`, `GET /cards/{id}/wallet-links`,
-`POST /operations/{accrue,redeem,validate-access,resolve}`.
+`POST /operations/{accrue,redeem,validate-access,resolve}`,
+`GET /admin/{clients,stats}`, `PATCH /admin/clients/{id}/subscription`.
 
-**Stubbed `501` (by phase):** `GET /programs/{id}/metrics` (P6),
-`GET /programs/{id}/redemptions` (P3/UI hydrate),
-`PUT /programs/{id}/birthday-automation` +
-`POST /birthday-cards` (P6), `GET /admin/*` + `PATCH /admin/*` (P6),
-`POST /notifications/reminders` (P6).
+**Stubbed `501` (deferred):** `PUT /programs/{id}/birthday-automation` +
+`POST /birthday-cards` (birthday automation), `POST /notifications/reminders` (messaging).
 
 ## Journeys
 
