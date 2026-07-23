@@ -11,8 +11,8 @@ Fixed decisions: [DECISIONS.md](DECISIONS.md).
 |---|---|---|
 | Database | ✅ live | Supabase (us-east-1) — schema + RLS + Data-API lockdown applied |
 | Backend API | ✅ live (prod) | `https://c8glyvxjh7.execute-api.us-east-1.amazonaws.com` — 10 Lambdas + 2 layers |
-| Frontend PWA | ✅ live (test host) | `https://d2gwyvyec58l70.cloudfront.net` (S3+CloudFront, HTTPS) |
-| Custom domains | ⏳ pending | `conpass.cards` (frontend) + `api.conpass.cards` — awaiting Hostinger CNAME |
+| Frontend PWA | ✅ live | `https://console.conpass.cards` (operator console; CNAME/alias → `d2gwyvyec58l70.cloudfront.net`). `/demo` browser-verified. |
+| Custom domains | ✅ connected (Phase 8) | Frontend live at `console.conpass.cards`. **Note:** origin must be in the backend CORS allowlist (fixed in Phase 7 — was causing a CORS error on API calls, most visibly `/demo`). |
 
 AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 
