@@ -1,6 +1,6 @@
 # conpass — build status
 
-_Updated: 2026-07-22_
+_Updated: 2026-07-23_
 
 Living status of the build. Plan & phase definitions: [BUILD-PLAN.md](BUILD-PLAN.md).
 Fixed decisions: [DECISIONS.md](DECISIONS.md).
@@ -28,6 +28,7 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | **6 — Admin + stubs** | 🟡 Core done, deployed, verified live | **Program metrics** (`GET /programs/{id}/metrics` via `program_metrics_view` — active passes ≈ active cards, wallet-saved callback deferred), **redemptions report** (`GET /programs/{id}/redemptions`), and **platform-admin** (`GET /admin/{clients,stats}` + `PATCH /admin/clients/{id}/subscription` = manual payment activation). Frontend: admin dashboard (stats + client list + confirm-payment) and panel metrics + redemptions wired. Verified end-to-end live (admin token + browser). Payment/messaging **providers stay stubbed** (by design). **Deferred**: birthday automation + `POST /notifications/reminders` (still `501`). Test account: `platform_admin` seeded (`scripts/seed_admin.py`). |
 | **8 — V1.1 modals + op-user mgmt + card personalization** | ✅ Done, deployed, verified live | Design V1.1 UI: inline panels → **modals + kebab (⋮) menus**. Admin: per-row ⋮ → "Gestionar cuenta" modal (change plan · mark paid · suspend/reactivate, via `PATCH /admin/clients/{id}/subscription`). Merchant panel: `+`-triggered **create/edit program modal** (+ per-program ⋮ edit/enable-disable via `PATCH /programs/{id}`) and a new **Usuarios de operación** section — add/edit/remove/reset-password (new endpoints `PATCH`/`DELETE`/`POST …/reset-password` on `/merchants/{id}/operation-users/{userId}`; reset returns a fresh temp password). **Card personalization**: color picker + icon/background upload to a **public-read S3 bucket** (`conpass-program-assets-prod`) via presigned PUT (`POST /programs/{id}/appearance-upload-url`); images wired onto the Google Wallet pass as `logo` + `heroImage`. Shared `Modal`/`Menu` primitives added to `@conpass/ui`. 53 backend tests + ruff clean; presign→S3→public-GET verified end-to-end in prod; deployed backend (`--force`) + frontend (CloudFront). Suspension is a status flag (no login-block enforcement this phase). |
 | **7 — Efficiency review + hardening** | ⏳ Pending | Incl. re-slimming the deps layer, optional Lambda authorizer at the edge, SnapStart eval. |
+| **9 — Session controls (V1.1)** | ✅ Done, deployed, verified live | Header **"Cerrar sesión"** on Admin (04), Panel (05) and cashier (06) → signs out and returns to login (07). In the `/demo` sandbox the same control becomes **"← Volver al demo"** (→ `/demo` hub) instead of a logout, so a demo visitor can leave a page without tearing down the shared demo session. Cashier result view (06·B) also gains a **"← Volver a escanear"** back link (the A→B flow was already sequential via the two cashier routes). Frontend-only; built (Node 20 + workbox) + deployed to CloudFront. |
 
 ## Endpoint status (deployed API)
 
