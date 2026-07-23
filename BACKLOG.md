@@ -11,6 +11,12 @@ MVP scope** per product decision. Kept here so nothing is lost. Not scheduled.
   global loading animation.)_
 
 ## Medium priority
+- **Lambda SnapStart.** Would cut cold-start init latency, but for this stack it's poor
+  ROI right now: Python SnapStart is **x86-only** (our Lambdas are arm64/Graviton — would
+  lose ~20%), it's **no longer free for Python** (per-version caching, min 3h, + per-restore
+  charge), and it needs **published versions/aliases** (httpApi rewiring). Revisit if
+  traffic grows and cold starts become the dominant cost. Cold starts are meanwhile reduced
+  by the re-slim + memory bump done in Phase 7. _(Phase 7 #3 — deferred after investigation.)_
 - **Google Wallet "pass saved" callback → `cards.wallet_installed`.** Nothing flips
   `wallet_installed` today, so the *active installed passes / installs-this-week* metrics
   (and the billing metric) are approximated as active cards. Wire the Google Wallet save
