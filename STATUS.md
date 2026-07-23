@@ -55,10 +55,19 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | Add to Apple Wallet | ❌ future (abstraction ready) | ❌ future |
 
 ## Quality
-27 tests pass (unit + live integration against real Supabase **and** real Google Wallet),
+54 tests pass (unit + live integration against real Supabase **and** real Google Wallet),
 ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
 
 ## Recently fixed
+- **Cashier accrue double-count (`0→1→3→6`)** — the idempotency store's `put` inserted response
+  bodies still holding `UUID`/`datetime` objects, so accrue/redeem 500'd *after* committing, the
+  key was never recorded, and the offline queue's retries re-applied the op. Fixed by normalizing
+  the stored body to JSON-safe primitives (`idempotency.py`); regression test added. Complementary
+  frontend fix: the cashier now awaits the backend and renders the **authoritative** balance.
+- **Slow merchant-panel load** — every request called `supabase.auth.getSession()`, serializing
+  concurrent fetches on supabase-js's auth lock. The API client now caches the token
+  (`onAuthStateChange`) so the panel's loads run in parallel. Also deduped the double `GET /me`
+  on login via `AuthContext.refreshIdentity()`.
 - **PWA stale-bundle after deploy** — SW now serves document navigations **network-first**
   (`vite.config.ts`: `navigateFallback: null` + a `conpass-app-shell` NetworkFirst rule),
   so a hard load / deep link always fetches the current bundle. Verified: `/demo` loads
@@ -71,15 +80,8 @@ ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
   migrations now tracked.
 
 ## Known follow-ups
-- Demo data: run `backend/scripts/reset_demo.py` to wipe sandbox activity; wire a nightly
-  scheduled reset later. Demo creds: `demo-owner@conpass.cards` / `conpass-demo-2026`.
-- Wire the PWA "Add to Google Wallet" button (link is in the enroll response +
-  `GET /cards/{id}/wallet-links`) + remaining screens (merchant panel, cashier, admin) — pairs with P6.
-- P7: move the cashier-path wallet push (`operations` accrue/redeem) to async
-  (SQS/EventBridge) — today it's synchronous best-effort, a slow Google call could
-  brush the <3s cashier budget (never fails the op).
-- ~~P7: pass logo/background images~~ ✅ done in Phase 8 — icon/background upload to public-read
-  S3 (`conpass-program-assets-prod`) via presigned PUT, wired onto the Wallet pass as `logo`/`heroImage`.
-- Enrollment route param is named `:merchantSlug` but carries the `programId` (works; rename for clarity).
-- Deps layer un-slimmed (`slim:false`) to keep `email-validator` metadata — re-slim in P7.
-- Test data uses `@conpasstest.io` (the `.test` TLD is rejected by email validation).
+
+Phase 8 is complete. **All remaining work now lives in [BACKLOG.md](BACKLOG.md)**, MVP-prioritized
+(P0 pre-launch · P1 soon-after · P2 polish/scale · deferred features). Operational note kept
+here: run `backend/scripts/reset_demo.py` to wipe demo-sandbox activity
+(creds `demo-owner@conpass.cards` / `conpass-demo-2026`).
