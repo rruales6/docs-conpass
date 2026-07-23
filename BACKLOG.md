@@ -11,6 +11,16 @@ MVP scope** per product decision. Kept here so nothing is lost. Not scheduled.
   global loading animation.)_
 
 ## Medium priority
+- **Edge REQUEST authorizer.** Verify the Supabase JWT once at API Gateway (a REQUEST
+  Lambda authorizer reusing `conpass_common.auth`, result cached per token) instead of
+  in every feature Lambda. Deferred: high blast radius (changes auth for all protected
+  routes at once) and the payoff is mostly at scale — the feature Lambda still runs per
+  request and only skips a cheap, already-`@lru_cache`'d JWKS verify; on a cache miss the
+  authorizer *adds* a Lambda hop. Real benefits are centralized auth + rejecting bad
+  tokens at the edge; revisit when traffic grows. Needs: authorizer Lambda + per-route
+  wiring (public routes stay open) + a dual-path `require_identity` (read authorizer
+  context when deployed, verify the header locally/in tests) + string-serialized roles.
+  _(Phase 7 #2 — deferred after scoping.)_
 - **Lambda SnapStart.** Would cut cold-start init latency, but for this stack it's poor
   ROI right now: Python SnapStart is **x86-only** (our Lambdas are arm64/Graviton — would
   lose ~20%), it's **no longer free for Python** (per-version caching, min 3h, + per-restore
