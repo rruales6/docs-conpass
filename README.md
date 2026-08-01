@@ -13,11 +13,13 @@ decisions, AWS setup, and design reference. Code lives in two sibling repos.
 | **[fte-conpass](https://github.com/rruales6/fte-conpass)** | Frontend — one unified installable React + Vite **PWA** (role-based: public / merchant / staff / platform-admin), duotone design system, ES/EN. |
 | **docs-conpass** (this) | Architecture, decisions, AWS runbooks, design reference. |
 
-Both apps share **one Supabase database** (Postgres + Auth + Storage + RLS).
+Both apps share **one Supabase database** (Postgres + Auth + RLS). Program image assets
+(icon / background) live in a public-read **AWS S3** bucket.
 
 ## Contents
 
 - **[STATUS.md](STATUS.md) — live build status & phase progress.**
+- [BACKLOG.md](BACKLOG.md) — remaining work, MVP-prioritized (P0 pre-launch → deferred).
 - [DECISIONS.md](DECISIONS.md) — fixed architecture & domain decisions.
 - [BUILD-PLAN.md](BUILD-PLAN.md) — phases, multi-agent workflow, credential gates.
 - [aws/](aws) — least-privilege IAM policies + the [deploy runbook](aws/DEPLOY.md).
@@ -25,9 +27,12 @@ Both apps share **one Supabase database** (Postgres + Auth + Storage + RLS).
 
 ## Status
 
+Phases 1–6 and 8 are done and deployed; Phase 7 (hardening) + post-Phase-8 items are the
+MVP-prioritized pool in [BACKLOG.md](BACKLOG.md). See [STATUS.md](STATUS.md) for detail.
+
 - **Database:** live on Supabase — schema + RLS + Data-API lockdown applied.
-- **Backend:** deployed to AWS (prod, us-east-1) — `https://c8glyvxjh7.execute-api.us-east-1.amazonaws.com`. Core domain (onboarding, programs, enrollment, in-store operations) working live; auth/wallet/admin phases in progress.
-- **Frontend:** PWA scaffolded and building; hosting on `conpass.cards` (S3 + CloudFront) pending.
+- **Backend:** deployed to AWS (prod, us-east-1) — `https://c8glyvxjh7.execute-api.us-east-1.amazonaws.com`. Live end-to-end: onboarding, auth/roles, programs, enrollment, in-store operations (offline + idempotent), Google Wallet (issue/update/revoke), platform-admin, program metrics/redemptions, and V1.1 operation-user management + card personalization (icon/background on S3 → wallet pass). Only birthday automation + notifications remain stubbed (`501`).
+- **Frontend:** unified PWA fully wired (public / merchant / cashier / platform-admin journeys) and deployed to the CloudFront test host; cutover to `conpass.cards` (S3 + CloudFront) pending — see BACKLOG P0.
 
 Core principles (non-negotiable): backend is the authority for balances; single-issuer
 wallet model; offline-capable idempotent cashier ops; opaque per-member QR; data

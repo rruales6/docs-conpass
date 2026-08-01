@@ -11,6 +11,19 @@
 5. **Unified PWA** — all screens from the design system, ES/EN, QR scanner. *Needs Supabase.*
 6. **Stubs + admin** — payment/messaging stubs, platform-admin, birthday automation.
 7. **Opus efficiency review + hardening.**
+8. **V1.1 design update — modals, operation-user management, card personalization** —
+   added after a design revision (`design/Conpass_ Wallet Pass Platform DesignV1.1.zip`).
+   Admin + merchant-panel inline panels/forms → **modals + kebab (⋮) action menus** (shared
+   `Modal`/`Menu` primitives in `@conpass/ui`); **operation-user management** (edit / delete /
+   reset-password endpoints on `/merchants/{id}/operation-users/{userId}`); **card
+   personalization** — color picker + icon/background upload to a public-read S3 bucket via
+   presigned PUT, wired onto the Google Wallet pass as `logo` / `heroImage`.
+   *Needs AWS S3 (program-assets bucket, provisioned via `serverless.yml`).*
+
+> Status is tracked in [STATUS.md](STATUS.md); remaining work (Phase 7 hardening + post-Phase-8
+> items) is MVP-prioritized in [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8 are done and deployed;
+> Phase 7 (hardening) is the pool in the backlog. Phase 8 ran ahead of 7 because it came from the
+> design revision, not the original plan.
 
 ## Multi-agent workflow
 
@@ -34,4 +47,6 @@ Work proceeds offline until it hits one of these; then it pauses and asks:
 
 - **Phase 2/5** need `supabase.*` (url, anon_key, service_role_key, jwt_secret, db_url).
 - **Phase 4** needs `google_wallet.*` (issuer_id, service_account_json).
+- **Phase 8** needs an **AWS S3** program-assets bucket (public-read; created by `serverless.yml`,
+  no new secret — uses the existing `aws.*` deploy credentials).
 - **Deploy** needs `aws.*` (region, profile/keys).
