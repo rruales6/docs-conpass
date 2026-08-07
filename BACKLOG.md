@@ -46,6 +46,17 @@ Priority key:
   Schemathesis contract fuzzing, CloudWatch alarms, and structured error tracking. _(Phase 7 #11.)_
 - **Secrets → AWS Secrets Manager / SSM.** The SA JSON + Supabase secret key are injected as
   Lambda env vars (under the 4 KB limit). Move to a managed, rotatable store. _(Phase 7 #9.)_
+- **Recurring payment proofs (renewal months).** Phase 10 stores the receipt as a SINGLE column
+  pair on `subscriptions` (`payment_proof_key` / `payment_proof_uploaded_at`), written only at
+  signup. Two consequences: (a) there is no path for an existing merchant to submit a receipt
+  for a later month, so "Gestionar cuenta" keeps showing the *signup* receipt while the admin
+  decides on this month's payment; (b) if such a path is added against the same column, a new
+  upload OVERWRITES the previous month's receipt and the old one is unrecoverable. When monthly
+  billing gets real, move to a `payment_proofs` history table (one row per upload) and have
+  `GET /admin/clients/{id}/payment-proof` return the newest — the modal intentionally shows only
+  the latest, so that endpoint change alone is enough, no frontend rework.
+  _(Explicit product decision in Phase 10: ship the single column, manage older proofs
+  out-of-band for now.)_
 
 ## P2 — Polish / scale
 
