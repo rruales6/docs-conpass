@@ -29,7 +29,7 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | **8 — V1.1 modals + op-user mgmt + card personalization** | ✅ Done, deployed, verified live | Design V1.1 UI: inline panels → **modals + kebab (⋮) menus**. Admin: per-row ⋮ → "Gestionar cuenta" modal (change plan · mark paid · suspend/reactivate, via `PATCH /admin/clients/{id}/subscription`). Merchant panel: `+`-triggered **create/edit program modal** (+ per-program ⋮ edit/enable-disable via `PATCH /programs/{id}`) and a new **Usuarios de operación** section — add/edit/remove/reset-password (new endpoints `PATCH`/`DELETE`/`POST …/reset-password` on `/merchants/{id}/operation-users/{userId}`; reset returns a fresh temp password). **Card personalization**: color picker + icon/background upload to a **public-read S3 bucket** (`conpass-program-assets-prod`) via presigned PUT (`POST /programs/{id}/appearance-upload-url`); images wired onto the Google Wallet pass as `logo` + `heroImage`. Shared `Modal`/`Menu` primitives added to `@conpass/ui`. 53 backend tests + ruff clean; presign→S3→public-GET verified end-to-end in prod; deployed backend (`--force`) + frontend (CloudFront). Suspension is a status flag (no login-block enforcement this phase). |
 | **7 — Efficiency review + hardening** | ⏳ Pending | Incl. re-slimming the deps layer, optional Lambda authorizer at the edge, SnapStart eval. |
 | **9 — Session controls (V1.1)** | ✅ Done, deployed, verified live | Header **"Cerrar sesión"** on Admin (04), Panel (05) and cashier (06) → signs out and returns to login (07). In the `/demo` sandbox the same control becomes **"← Volver al demo"** (→ `/demo` hub) instead of a logout, so a demo visitor can leave a page without tearing down the shared demo session. Cashier result view (06·B) also gains a **"← Volver a escanear"** back link (the A→B flow was already sequential via the two cashier routes). Frontend-only; built (Node 20 + workbox) + deployed to CloudFront. |
-| **10 — Manual-payment activation (02 + 04)** | ✅ Done, deployed | Signup (Función 02) can no longer be activated on trust: the **"Activar cuenta" CTA stays disabled until a transfer receipt is uploaded**, and the page says so in plain language rather than hiding it in a tooltip. The gate is enforced **server-side too** — `POST /merchants` returns `422` when a `deuna`/`manual_transfer` payment arrives without a `proofStorageKey`. The payment card now matches the design's method toggle (**card tab visible but disabled — no processor is integrated**) and shows the **written transfer details** (bank, account type, account number with copy, beneficiary, RUC, contact email) *alongside* the QR, so a payer never depends on the QR alone. Those details are **DB-backed** — `platform_payment_settings`, a singleton table (migration `0008`) — and maintained from Función 04's new **"Datos de pago"** card + modal (all fields + QR upload), so changing the bank account or QR needs no redeploy. Función 04's "Gestionar cuenta" gains **"Ver comprobante"** (short-lived presigned link) right above "Marcar como pagado", plus the upload date; it states plainly when no receipt exists. Receipts go to a **private** bucket `conpass-payment-proofs-prod` (all four public-access blocks on) via a public presigned PUT; only platform-admin can read one back. Row→API mapping lives once in `conpass_common/payment_settings.py`, shared by both Lambdas. 70 backend tests + ruff clean. **Known limit (backlogged):** the proof is a single column written only at signup — no renewal-month upload path, and adding one against that column would overwrite the prior receipt. |
+| **10 — Manual-payment activation (02 + 04)** | ✅ **Closed** — done, deployed, verified live | Signup (Función 02) can no longer be activated on trust: the **"Activar cuenta" CTA stays disabled until a transfer receipt is uploaded**, and the page says so in plain language rather than hiding it in a tooltip. The gate is enforced **server-side too** — `POST /merchants` returns `422` when a `deuna`/`manual_transfer` payment arrives without a `proofStorageKey`. The payment card now matches the design's method toggle (**card tab visible but disabled — no processor is integrated**) and shows the **written transfer details** (bank, account type, account number with copy, beneficiary, RUC, contact email) *alongside* the QR, so a payer never depends on the QR alone. Those details are **DB-backed** — `platform_payment_settings`, a singleton table (migration `0008`) — and maintained from Función 04's new **"Datos de pago"** card + modal (all fields + QR upload), so changing the bank account or QR needs no redeploy. Función 04's "Gestionar cuenta" gains **"Ver comprobante"** (short-lived presigned link) right above "Marcar como pagado", plus the upload date; it states plainly when no receipt exists. Receipts go to a **private** bucket `conpass-payment-proofs-prod` (all four public-access blocks on) via a public presigned PUT; only platform-admin can read one back. Row→API mapping lives once in `conpass_common/payment_settings.py`, shared by both Lambdas. 70 backend tests + ruff clean. **Known limit (backlogged):** the proof is a single column written only at signup — no renewal-month upload path, and adding one against that column would overwrite the prior receipt. |
 
 ## Endpoint status (deployed API)
 
@@ -60,10 +60,19 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | Add to Apple Wallet | ❌ future (abstraction ready) | ❌ future |
 
 ## Quality
-54 tests pass (unit + live integration against real Supabase **and** real Google Wallet),
+70 tests pass (unit + live integration against real Supabase **and** real Google Wallet),
 ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
 
 ## Recently fixed
+- **Program-assets bucket CORS was missing `console.conpass.cards`** — the live operator console
+  is served from that origin, so every browser upload to the assets bucket (program icon /
+  background, and now the payment QR) would have failed with an opaque CORS error. Found while
+  wiring Phase 10; fixed in `serverless.yml`. Note the same allowlist exists on the new
+  payment-proofs bucket — see [aws/DEPLOY.md](aws/DEPLOY.md).
+- **`scripts/deploy.sh` silently dropped `--force`** — the file was mode `644` (so a bare
+  `scripts/deploy.sh` died with "Permission denied") and it ignored any argument after the
+  stage, meaning the `--force` that config-only deploys require was never reaching serverless.
+  Now executable, and everything after the stage is forwarded.
 - **Cashier accrue double-count (`0→1→3→6`)** — the idempotency store's `put` inserted response
   bodies still holding `UUID`/`datetime` objects, so accrue/redeem 500'd *after* committing, the
   key was never recorded, and the offline queue's retries re-applied the op. Fixed by normalizing
@@ -86,7 +95,16 @@ ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
 
 ## Known follow-ups
 
-Phase 8 is complete. **All remaining work now lives in [BACKLOG.md](BACKLOG.md)**, MVP-prioritized
-(P0 pre-launch · P1 soon-after · P2 polish/scale · deferred features). Operational note kept
-here: run `backend/scripts/reset_demo.py` to wipe demo-sandbox activity
-(creds `demo-owner@conpass.cards` / `conpass-demo-2026`).
+Phase 10 is closed. **All remaining work lives in [BACKLOG.md](BACKLOG.md)**, MVP-prioritized
+(P0 pre-launch · P1 soon-after · P2 polish/scale · deferred features).
+
+⚠️ **Launch blocker carried out of Phase 10:** the transfer/DEUNA details ship EMPTY, and signup
+deliberately refuses to take money until they are published — **no merchant can subscribe** until
+platform-admin fills them in at `/admin` → *Datos de pago*. It is an operational step, not a code
+task. See [RUNBOOK-PAYMENTS.md](RUNBOOK-PAYMENTS.md).
+
+Operational notes kept here:
+- Manual payment flow (publish details → verify receipt → mark paid), plus troubleshooting:
+  [RUNBOOK-PAYMENTS.md](RUNBOOK-PAYMENTS.md).
+- Run `backend/scripts/reset_demo.py` to wipe demo-sandbox activity
+  (creds `demo-owner@conpass.cards` / `conpass-demo-2026`).

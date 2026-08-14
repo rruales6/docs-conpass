@@ -19,6 +19,10 @@ business model (`docs/modelo-negocio.md` §10) + design (`docs/design-reference`
 | D7c | Frontend served from **https://conpass.cards**; API on **https://api.conpass.cards** (CORS locked to the frontend origin) | user |
 | D8 | Wallet vendors behind `WalletProvider` interface — **Google now, Apple later** with zero feature changes | user |
 | D9 | Payments **stubbed** behind `PaymentProvider` (manual proof only for now) | user |
+| D9a | A manual-transfer/DEUNA signup **requires a receipt**. Enforced server-side: `POST /merchants` returns `422` without `payment.proofStorageKey`. The disabled CTA in the PWA is UX; the API check is the gate, and both stay | user (Phase 10) |
+| D9b | The transfer/DEUNA account details are **DB-backed and admin-editable** (`platform_payment_settings`, a singleton), not config — the bank account or QR can change with no redeploy. One shared row→API mapper (`conpass_common/payment_settings.py`) serves both the public read and the admin write so they cannot drift | user (Phase 10) |
+| D9c | Card payments are **not integrated**. The card tab renders (it is in the design) but is `disabled` + *Próximamente*; it must never be able to activate an account until a real processor exists | derived (Phase 10) |
+| D11 | **Two S3 buckets, split by audience.** Program images + the payment QR are public-read (they are shown to anonymous visitors). Payment receipts go in a separate **private** bucket — they carry names, account numbers and amounts — written via a public presigned PUT and read only via an admin-signed GET. Receipts must never be moved into the public bucket | user (Phase 10) |
 | D10 | Messaging (WhatsApp/email) **stubbed** behind `NotificationProvider` | user |
 
 ## Domain rules (from business model §10)

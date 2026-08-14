@@ -22,6 +22,16 @@ Priority key:
 - **Least-privilege IAM + rotate secrets.** Replace the temporary AWS admin (`conpass-admin`)
   with the scoped policies already in `docs/aws/`; rotate the seeded demo/platform-admin
   passwords (currently shared test creds) before exposing prod. _(Phase 7 #10.)_
+- **Publish the transfer/DEUNA account details.** `platform_payment_settings` ships EMPTY, and
+  signup deliberately refuses to take money while `accountNumber` is blank — the page says the
+  details aren't published and the activate button stays disabled. **No merchant can subscribe
+  until platform-admin fills this in** at `/admin` → *Datos de pago* (bank, account type +
+  number, beneficiary, RUC, contact email, QR). Not a code task — an operational one, but it is
+  a hard launch blocker. See [RUNBOOK-PAYMENTS.md](RUNBOOK-PAYMENTS.md). _(Phase 10.)_
+- **Also add the payment-proofs bucket CORS origin at domain cutover.** The custom-domain item
+  above must now update **two** buckets — `conpass-program-assets-prod` and
+  `conpass-payment-proofs-prod` both carry a `CorsConfiguration` allowlist in `serverless.yml`.
+  Missing the new origin silently breaks browser uploads. _(Phase 10.)_
 
 ## P1 — Soon after launch
 
@@ -57,6 +67,21 @@ Priority key:
   the latest, so that endpoint change alone is enough, no frontend rework.
   _(Explicit product decision in Phase 10: ship the single column, manage older proofs
   out-of-band for now.)_
+- **Harden the public payment-proof upload.** `POST /payment-proofs/upload-url` is
+  unauthenticated *by necessity* — the account does not exist yet when the receipt is uploaded.
+  Three gaps follow, all currently accepted at MVP volume because the blast radius is S3 cost
+  rather than data exposure (objects are private, keys are server-generated and random, content
+  type is signed): (a) **no rate limit** — anyone can mint upload URLs in a loop; (b) **no
+  lifecycle rule** on `conpass-payment-proofs-prod`, and nothing deletes orphaned receipts from
+  abandoned signups, so storage only grows; (c) the **5 MB cap is client-side only** — a
+  presigned PUT carries no size condition, so a direct caller can exceed it. Fixes: an
+  expiration lifecycle rule for un-referenced keys, a presigned **POST** with a
+  `content-length-range` condition instead of a PUT, and throttling on that route.
+  _(Phase 10 — documented in [RUNBOOK-PAYMENTS.md](RUNBOOK-PAYMENTS.md).)_
+- **Stale-payment visibility.** Nothing reconciles against the bank and nothing surfaces that a
+  client has sat at `paymentStatus: pending` for weeks — the admin has to notice. An "overdue /
+  pending for N days" signal on the client list would make the manual flow safe to run at more
+  than a handful of clients. _(Phase 10.)_
 
 ## P2 — Polish / scale
 
@@ -96,9 +121,12 @@ Priority key:
 - **Birthday automation** — `PUT /programs/{id}/birthday-automation`, `POST /birthday-cards`
   remain `501`.
 - **Notifications / reminders** — `POST /notifications/reminders` remains `501`.
-- **Real payment + messaging providers.** Payment (activation is manual via admin "Confirmar
-  pago") and messaging (WhatsApp/email) are stubbed behind interfaces by design. Real
-  integrations (and thus automated billing/dunning) are post-MVP.
+- **Real payment + messaging providers.** Payment (activation is manual: the merchant uploads a
+  transfer receipt, platform-admin verifies it and marks paid) and messaging (WhatsApp/email)
+  are stubbed behind interfaces by design. Real integrations — and thus automated
+  billing/dunning — are post-MVP. **Card payments specifically:** the "Tarjeta de crédito" tab
+  renders on the signup page per the design but is `disabled` and badged *Próximamente*, because
+  no processor is integrated; enabling it is exactly this item. _(Phase 10.)_
 
 ## Dev notes (not backlog)
 
