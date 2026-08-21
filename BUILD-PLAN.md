@@ -31,11 +31,31 @@
     client's receipt before marking them paid. Receipts land in a **private** S3 bucket
     (presigned PUT to write, admin-only presigned GET to read).
     *Needs AWS S3 (payment-proofs bucket, provisioned via `serverless.yml`).*
+11. **Card background: colour + optional image (and Google's image spec)** — creating a
+    program painted an uploaded background image at 35 % opacity *over* the background
+    colour, so the two visibly overlapped. The preview now composes them the way a pass
+    does — the colour is the card, the image sits on it as a hero block — instead of
+    blending them. The colour **always applies** and stays a merchant choice: Google
+    documents a fallback (hero image → logo → a colour Google picks) but a real pass was
+    observed keeping its original green, so the colour is set explicitly rather than left
+    to a guess. Removing an uploaded image is possible for the first time (an empty
+    storage key clears the field). Both uploads
+    now follow **Google's Generic-pass image spec**: logo PNG 660×660 1:1 (was documented
+    512×512, below Google's minimum) and hero image PNG 1032×812 ≈5:4 (was 1032×336 JPG,
+    with the picker refusing PNG — the one format whose transparency lets the colour show
+    through). Picked files are dimension-checked in the browser, with a non-blocking
+    warning. Also fixed two things the pass itself got wrong: an installed pass never
+    picked up a later edit (`update()` patched only the balance text, and nothing pushed
+    on a program change), and the **tracked balance was buried** in the details section
+    the holder has to expand. Now `update()` replaces the whole object — so colour, logo
+    and hero image reach passes that are already in someone's wallet, and a removed image
+    is actually cleared — a program edit pushes to its installed passes (best-effort,
+    bounded), and the **stamps/points balance is the pass title**. *No new credentials.*
 
 > Status is tracked in [STATUS.md](STATUS.md); remaining work is MVP-prioritized in
-> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–10 are done and deployed; Phase 7 (hardening)
-> was partly done and the rest lives in the backlog. Phases 8–10 ran ahead of 7 because they
-> came from design revisions rather than the original plan.
+> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–11 are done and deployed; Phase 7 (hardening)
+> was partly done and the rest lives in the backlog. Phases 8–11 ran ahead of 7 because they
+> came from design revisions and field reports rather than the original plan.
 
 ## Multi-agent workflow
 

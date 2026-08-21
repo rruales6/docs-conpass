@@ -67,6 +67,18 @@ Priority key:
   the latest, so that endpoint change alone is enough, no frontend rework.
   _(Explicit product decision in Phase 10: ship the single column, manage older proofs
   out-of-band for now.)_
+- **Short asset host, so every save link can be self-contained.** The "Add to Google Wallet"
+  JWT embeds the whole pass object and must stay under Google's 1800-character safe length.
+  New uploads use terse keys (`p/<prog8>/b<10 hex>.jpg`) and fit (~1 704 chars), but programs
+  whose images were uploaded before that keep long `programs/<uuid>/<kind>-<32 hex>` keys and
+  land at ~1 875 — those links fall back to the id-reference form. Serving the assets bucket
+  from a short host (e.g. `assets.conpass.cards` via CloudFront) saves ~35 characters per image
+  URL and fixes it for existing programs without re-uploading. Pairs with the domain cutover
+  above. _(Phase 11 — see [RUNBOOK-WALLET.md](RUNBOOK-WALLET.md).)_
+- **Wallet push is capped at `WALLET_PUSH_MAX_CARDS` (40) per program edit.** Each card is its
+  own Google API call inside a 15 s Lambda, so a program with more cards only refreshes the
+  first 40; the rest pick the change up on their next operation. The real fix is the async
+  wallet push above (SQS/EventBridge), which would remove the cap entirely. _(Phase 11.)_
 - **Harden the public payment-proof upload.** `POST /payment-proofs/upload-url` is
   unauthenticated *by necessity* — the account does not exist yet when the receipt is uploaded.
   Three gaps follow, all currently accepted at MVP volume because the blast radius is S3 cost
@@ -111,6 +123,11 @@ Priority key:
   cold starts become the dominant cost. _(Phase 7 #3.)_
 - **PWA "new version available" toast.** Surface a "refresh for the latest" prompt when the
   service worker detects a new build. _(Phase 7 #13.)_
+- **Existing program images predate the Google spec.** Phase 11 corrected the documented sizes
+  (icon 660×660 PNG 1:1, background 1032×812 PNG ≈5:4) and warns on mismatch, but only when a
+  merchant picks a *new* file — assets uploaded before that (e.g. against the old "512×512 /
+  1032×336 JPG" guidance) are never re-checked. A one-off audit of stored assets, or a warning
+  on the existing image when the modal opens, would catch them. _(Phase 11.)_
 - **Enrollment route param rename.** `:merchantSlug` actually carries the `programId` (works;
   rename for clarity).
 - **Demo sandbox nightly reset.** `scripts/reset_demo.py` wipes sandbox activity; wire it to a

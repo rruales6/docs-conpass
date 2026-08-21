@@ -23,6 +23,8 @@ receipts live in a separate **private** one.
 - [BACKLOG.md](BACKLOG.md) — remaining work, MVP-prioritized (P0 pre-launch → deferred).
 - [DECISIONS.md](DECISIONS.md) — fixed architecture & domain decisions.
 - [BUILD-PLAN.md](BUILD-PLAN.md) — phases, multi-agent workflow, credential gates.
+- [RUNBOOK-WALLET.md](RUNBOOK-WALLET.md) — Google Wallet: the class/object model, what the
+  pass shows, the 1800-character save-link budget, and how an installed pass stays in sync.
 - [RUNBOOK-PAYMENTS.md](RUNBOOK-PAYMENTS.md) — the manual subscription-payment flow: publish
   the transfer details, verify a receipt, mark paid; plus troubleshooting and known limits.
 - [aws/](aws) — least-privilege IAM policies + the [deploy runbook](aws/DEPLOY.md).

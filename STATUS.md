@@ -1,6 +1,6 @@
 # conpass — build status
 
-_Updated: 2026-08-06_
+_Updated: 2026-08-14_
 
 Living status of the build. Plan & phase definitions: [BUILD-PLAN.md](BUILD-PLAN.md).
 Fixed decisions: [DECISIONS.md](DECISIONS.md).
@@ -31,6 +31,8 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | **9 — Session controls (V1.1)** | ✅ Done, deployed, verified live | Header **"Cerrar sesión"** on Admin (04), Panel (05) and cashier (06) → signs out and returns to login (07). In the `/demo` sandbox the same control becomes **"← Volver al demo"** (→ `/demo` hub) instead of a logout, so a demo visitor can leave a page without tearing down the shared demo session. Cashier result view (06·B) also gains a **"← Volver a escanear"** back link (the A→B flow was already sequential via the two cashier routes). Frontend-only; built (Node 20 + workbox) + deployed to CloudFront. |
 | **10 — Manual-payment activation (02 + 04)** | ✅ **Closed** — done, deployed, verified live | Signup (Función 02) can no longer be activated on trust: the **"Activar cuenta" CTA stays disabled until a transfer receipt is uploaded**, and the page says so in plain language rather than hiding it in a tooltip. The gate is enforced **server-side too** — `POST /merchants` returns `422` when a `deuna`/`manual_transfer` payment arrives without a `proofStorageKey`. The payment card now matches the design's method toggle (**card tab visible but disabled — no processor is integrated**) and shows the **written transfer details** (bank, account type, account number with copy, beneficiary, RUC, contact email) *alongside* the QR, so a payer never depends on the QR alone. Those details are **DB-backed** — `platform_payment_settings`, a singleton table (migration `0008`) — and maintained from Función 04's new **"Datos de pago"** card + modal (all fields + QR upload), so changing the bank account or QR needs no redeploy. Función 04's "Gestionar cuenta" gains **"Ver comprobante"** (short-lived presigned link) right above "Marcar como pagado", plus the upload date; it states plainly when no receipt exists. Receipts go to a **private** bucket `conpass-payment-proofs-prod` (all four public-access blocks on) via a public presigned PUT; only platform-admin can read one back. Row→API mapping lives once in `conpass_common/payment_settings.py`, shared by both Lambdas. 70 backend tests + ruff clean. **Known limit (backlogged):** the proof is a single column written only at signup — no renewal-month upload path, and adding one against that column would overwrite the prior receipt. |
 
+| **11 — Card background + Google image spec** | ✅ Done, deployed, verified live | Creating a program painted an uploaded background image at **35 % opacity over the background colour**, so the two visibly overlapped. The card preview now composes them the way a wallet pass does — the colour *is* the card, the image sits on it as a hero block — rather than blending them. The colour **always applies** and stays a merchant choice: Google documents a fallback (hero image → logo → a colour Google picks) but a real pass was seen keeping its original green, so we always send the colour explicitly rather than leave it to a guess, and a transparent PNG lets that colour show through. An **empty storage key clears a field**, which finally gives the panel a way to **remove** an uploaded image. Both uploads now follow **Google's Generic-pass image spec**: logo PNG 660×660 1:1 (was documented 512×512 — *below* Google's minimum) and hero image PNG 1032×812 ≈5:4 (was 1032×336 JPG, and the picker refused PNG outright — the one format whose transparency lets the colour through). Picked files are dimension-checked in the browser and a mismatch raises a **non-blocking amber warning**, never a block. **Wallet sync fixed** in the same pass: `GoogleWalletProvider.update()` patched only `textModulesData`+`state` and was called only after accrue/redeem, so an **installed pass never picked up a later appearance edit** — it now PUTs the whole object (a replace, so a removed image is genuinely cleared) and a program `PATCH` pushes to that program's installed passes, best-effort and bounded to `WALLET_PUSH_MAX_CARDS` per request. And the **tracked balance is now the pass title** (`header` = "3 / 8 sellos" / "120 / 200 puntos" / "Activa hasta …", programme name moved to `subheader`) — it used to sit in `textModulesData`, which Google only shows once the holder expands the pass. The **save link now carries the full `genericObject`** (per Google's web guide) instead of just an object id, so it can create the pass on its own when the best-effort REST pre-creation didn't happen — see **D13** and [RUNBOOK-WALLET.md](RUNBOOK-WALLET.md) for the 1800-character budget this has to fit in. 86 backend tests + ruff clean. |
+
 ## Endpoint status (deployed API)
 
 **Live:** `GET /health`, `GET /me`, `GET /demo`, `POST /merchants`, `GET /merchants/{id}`,
@@ -60,38 +62,17 @@ AWS account 154320462594 · deploy: `backend/scripts/deploy.sh conpass prod`.
 | Add to Apple Wallet | ❌ future (abstraction ready) | ❌ future |
 
 ## Quality
-70 tests pass (unit + live integration against real Supabase **and** real Google Wallet),
+86 tests pass (unit + live integration against real Supabase **and** real Google Wallet),
 ruff clean. Backend CI workflow disabled per request (`ci.yml.disabled`).
 
 ## Recently fixed
-- **Program-assets bucket CORS was missing `console.conpass.cards`** — the live operator console
-  is served from that origin, so every browser upload to the assets bucket (program icon /
-  background, and now the payment QR) would have failed with an opaque CORS error. Found while
-  wiring Phase 10; fixed in `serverless.yml`. Note the same allowlist exists on the new
-  payment-proofs bucket — see [aws/DEPLOY.md](aws/DEPLOY.md).
-- **`scripts/deploy.sh` silently dropped `--force`** — the file was mode `644` (so a bare
-  `scripts/deploy.sh` died with "Permission denied") and it ignored any argument after the
-  stage, meaning the `--force` that config-only deploys require was never reaching serverless.
-  Now executable, and everything after the stage is forwarded.
-- **Cashier accrue double-count (`0→1→3→6`)** — the idempotency store's `put` inserted response
-  bodies still holding `UUID`/`datetime` objects, so accrue/redeem 500'd *after* committing, the
-  key was never recorded, and the offline queue's retries re-applied the op. Fixed by normalizing
-  the stored body to JSON-safe primitives (`idempotency.py`); regression test added. Complementary
-  frontend fix: the cashier now awaits the backend and renders the **authoritative** balance.
-- **Slow merchant-panel load** — every request called `supabase.auth.getSession()`, serializing
-  concurrent fetches on supabase-js's auth lock. The API client now caches the token
-  (`onAuthStateChange`) so the panel's loads run in parallel. Also deduped the double `GET /me`
-  on login via `AuthContext.refreshIdentity()`.
-- **PWA stale-bundle after deploy** — SW now serves document navigations **network-first**
-  (`vite.config.ts`: `navigateFallback: null` + a `conpass-app-shell` NetworkFirst rule),
-  so a hard load / deep link always fetches the current bundle. Verified: `/demo` loads
-  fresh on first load. (Applies going forward once each client picks up this SW.)
-- **`apply_migrations.py` silently rolled back every migration** — root cause: a trailing
-  `SELECT` on a non-autocommit connection left a txn open, so each `with conn.transaction()`
-  became a savepoint that never top-level committed and `close()` rolled it all back (while
-  printing "applied"). Fixed: `autocommit=True`, force session port 5432 (not the 6543 txn
-  pooler), correct pooler user/ref. Verified persistence with a throwaway migration; all 6
-  migrations now tracked.
+- **Program background colour and image overlapped** — the card preview blended an uploaded
+  background over the colour at 35 % opacity, which read as an unintended overlap. The preview
+  now draws the image *on* the coloured card instead of through it. The first fix attempt made
+  the two mutually exclusive on the assumption that Google would derive a background colour from
+  the hero image; a real pass proved it does not (it keeps its own default), so the colour went
+  back to being a merchant choice that applies alongside the image. See **D12** in
+  [DECISIONS.md](DECISIONS.md).
 
 ## Known follow-ups
 
@@ -106,5 +87,14 @@ task. See [RUNBOOK-PAYMENTS.md](RUNBOOK-PAYMENTS.md).
 Operational notes kept here:
 - Manual payment flow (publish details → verify receipt → mark paid), plus troubleshooting:
   [RUNBOOK-PAYMENTS.md](RUNBOOK-PAYMENTS.md).
+- Google Wallet passes — object model, what the pass shows, the save-link size budget, how an
+  installed pass stays in sync, troubleshooting: [RUNBOOK-WALLET.md](RUNBOOK-WALLET.md).
 - Run `backend/scripts/reset_demo.py` to wipe demo-sandbox activity
   (creds `demo-owner@conpass.cards` / `conpass-demo-2026`).
+- **Prod data was reset to a clean slate on 2026-08-21** (at the owner's request, to retest from
+  scratch): the two non-demo merchants and all programs/cards/customers/transactions were
+  deleted, auth users pruned to `admin@conpass.cards` + `demo-owner@conpass.cards`, orphaned
+  program images removed from `conpass-program-assets-prod`, and the demo tenant re-seeded with
+  one fresh program via `scripts/seed_demo.py`. Google Wallet objects were deliberately left
+  alone, so passes saved before the reset now reference cards that no longer exist — they stay
+  on the phone unchanged and their update pushes no-op.
