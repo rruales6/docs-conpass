@@ -23,25 +23,49 @@ Google-side needs to be stored to find a pass again:
 Issuer `3388000000023155712`, service account `conpass-generic@conpass-502402`. One shared
 issuer for every merchant (B2).
 
-The class is intentionally thin — `issuerName` and device policy. **All visible content is
-on the object**, because for Generic passes `hexBackgroundColor`, `logo` and `heroImage` are
-object-level fields. That is why changing a program's appearance means touching every card,
-not one class.
+The class carries `issuerName`, the device policy, and — since Phase 12 — the
+**`classTemplateInfo.cardTemplateOverride`** that decides which rows are drawn on the front
+of the card. Everything those rows *say* is still object-level (`hexBackgroundColor`, `logo`,
+`heroImage` and every `textModulesData` value are object fields for Generic passes), so a
+program appearance change still means touching every card. The class only describes the
+**shape**; the object supplies the **content**.
+
+`_ensure_class` therefore **PUTs a class that already exists** instead of only creating on a
+404. Create-only would strand every program whose class predates the template — it would keep
+rendering the old pass forever. The PUT is idempotent, so re-running costs one request.
 
 ## 2. What the holder sees
 
 | Field | Content | Where it renders |
 |---|---|---|
 | `cardTitle` | merchant name | top row, next to the logo |
-| `subheader` | program name | small label above the title |
-| `header` | **the tracked balance** — `3 / 8 sellos`, `120 / 200 puntos`, `Activa hasta …` | the title line |
+| `subheader` | **kind of card** — "Tarjeta de lealtad" / "Pase de membresía" | small kicker above the title |
+| `header` | **program name** | the title line |
 | `barcode` | opaque per-card token, QR | scanned by the cashier |
-| `textModulesData` | holder, reward, validity | details — only after the holder expands the pass |
+| `textModulesData` | the values behind every templated cell | the card front, via the class template |
 | `hexBackgroundColor` / `logo` / `heroImage` | program appearance | card background / logo / banner |
 
-`_status_line()` builds the balance text. The balance is the **title**, not a text module:
-Google only shows `textModulesData` once the pass is expanded, which is too late for
-"how many stamps do I have".
+The rows on the front, built by `_card_rows` (shape, class) and `_text_modules` (values,
+object). Ids are positional and the two must agree — a cell bound to an id the object never
+emits renders blank, which reads as a broken pass rather than an absent value:
+
+| Row | Layout | `loyalty_stamps` | `loyalty_points` | `membership_pass` |
+|---|---|---|---|---|
+| 1 | `threeItems` | `hdr0` SELLOS `●●●○○○○○` · `hdr1` PROGRESO `3 / 8` · `hdr2` PREMIOS `1` | `hdr0` PUNTOS `120` · `hdr1` META `200` · `hdr2` PREMIOS `1` | `hdr0` ESTADO `Activa` · `hdr1` VÁLIDA HASTA `2026-12-31` · `hdr2` INCLUYE … |
+| 2 | `oneItem` | `sec0` RECOMPENSA → the program's reward text. **Omitted from the template entirely** when the program defines no reward | | |
+| 3 | `twoItems` | `sec1` MIEMBRO → holder name · `sec2` CORREO → member email | | |
+
+Two rules behind that table:
+
+- **The dot strip is for recognition, the figure for reading.** `stamp_strip()` draws `●○`
+  only when there is a target and it is at most `MAX_STAMP_DOTS` (12); past that the dots
+  blur together, so row 1 collapses to the plain count and the target.
+- **A missing per-card value renders `—`, not blank.** Row shape is a *program* decision, so
+  a reward-less program simply has no reward row. Name and email are *per card*, and a class
+  template cannot vary by card — so an anonymous enrollment gets a placeholder (D15).
+
+Labels come from `_LABELS`, keyed by the card's own language (`cards.language`, captured from
+the enroll form — D16), not by the holder's device locale.
 
 ## 3. Auth and transport — no Google SDK
 
@@ -56,22 +80,29 @@ dependencies** and no cold-start weight.
 
 ## 4. The save link and its 1800-character budget
 
-The JWT embeds the **whole `genericObject`**, per Google's web guide, so the link can create
-the pass by itself — the REST pre-creation in `issue()` is best-effort and must never block
-enrollment, so the link cannot depend on it having worked.
+**When the object exists, the link just references it by id (~700 chars).** That is Google's
+own mitigation for the URL-length limit, and since Phase 12 it is the primary path rather
+than a rescue — which is exactly what lets the card-front layout grow without the link
+silently degrading. `issue()` knows the object exists because it just wrote it; `add_link()`
+probes with a read, which keeps that `GET` endpoint side-effect-free.
 
-The constraint is size. Google: *"The safe length of an encoded JWT is 1800 characters… If
-the length is over 1800 characters, the save may not work due to truncation by web
-browsers."* Measured, for a real program with a logo and a hero image:
+The self-contained form remains for the one case that needs it: a link minted **without**
+that assurance has to be able to create the pass on its own, because `issue()`'s REST
+pre-creation is best-effort and must never block enrollment.
 
-| Variant | chars |
-|---|---|
-| id-reference only (no object) | 705 |
-| full object + `origins` | 2 241 |
-| full object, no `origins` | 2 033 |
-| full, no `origins`, no image alt-text | 1 875 |
-| **full, short asset keys** | **1 704** ✅ |
-| full, no images at all | 1 375 ✅ |
+The constraint it exists for is size. Google: *"The safe length of an encoded JWT is 1800
+characters… If the length is over 1800 characters, the save may not work due to truncation by
+web browsers."* Measured, for a real program with a logo and a hero image:
+
+| Variant | Phase 11 | Phase 12 (card-front rows) |
+|---|---|---|
+| **id-reference only (no object)** | 705 | **685** ✅ *(the normal path)* |
+| full object + `origins` | 2 241 | — |
+| full object, no `origins`, short asset keys | 1 704 ✅ | 2 035 ❌ |
+| full object, no images at all | 1 375 ✅ | 1 703 ✅ |
+
+The middle row is the point: the richer pass no longer fits the self-contained form once it
+carries images. Nothing was cut to make it fit — the link stopped needing to carry it.
 
 Which is why the payload omits two optional things, both bought back as content budget:
 
@@ -82,24 +113,17 @@ and why asset keys are terse: `p/<prog8>/b5c72d2470e.jpg`, not
 `programs/<uuid>/background-<32 hex>.jpg` (`assets.py`). Each image URL sits inside the JWT,
 so ~85 characters per image is a real cost.
 
-**Fallback.** If the embedded form still exceeds the limit, `_save_link` falls back to
-Google's documented mitigation — reference the already-created object by id (705 chars).
-That is only safe when the object exists, hence `object_exists=`; `issue()` knows it does,
-and `add_link()` probes with a read (keeping that `GET` endpoint side-effect-free). With no
-such assurance it keeps the oversized self-contained link and logs a warning, because a
-possibly-truncated link still beats a short link pointing at nothing.
-
-> **Programs whose images predate the short-key format** (long `programs/…` keys) land at
-> ~1 875 and therefore fall back. Re-uploading either image in the panel fixes it. Serving
-> assets from a short host would fix it for everyone — see BACKLOG.
+When the object is *not* known to exist and the self-contained payload is over the limit,
+`_save_link` keeps it anyway and logs a warning: a possibly-truncated link still beats a
+short link pointing at nothing.
 
 ## 5. Keeping an installed pass in sync
 
 | Trigger | What happens |
 |---|---|
-| Enrollment | `issue()` — ensure class, create/refresh object, return the save link |
+| Enrollment | `issue()` — ensure class (create **or** update), create/refresh object, return the save link |
 | Accrue / redeem | `update()` after commit, best-effort |
-| `PATCH /programs/{id}` | `_push_appearance_to_passes()` — pushes to that program's cards |
+| `PATCH /programs/{id}` | `sync_program()` once for the class template, then `_push_appearance_to_passes()` for that program's cards |
 | Cleanup / live test | `revoke()` — `state: INACTIVE` (Google objects cannot be hard-deleted) |
 
 `update()` is a **PUT — a full replace**, not a patch. Two reasons: appearance edits have to
@@ -119,7 +143,9 @@ so toggling `active` costs nothing. A wallet outage never fails the program edit
 | Pass shows an old colour / logo / reward | It predates the sync fix, or the program has more than `WALLET_PUSH_MAX_CARDS` cards. Re-save the program, or operate on the card |
 | "Add to Google Wallet" opens an error | The link referenced an object that was never created — check the `issue()` warning in CloudWatch |
 | Save link looks truncated | Over 1800 chars. Check the warning log; shorten the asset URLs |
-| Balance not visible without expanding | Pass was issued before the balance moved to `header` — any update refreshes it |
+| Balance not visible without expanding | The program's class has no card-front template yet. It is refreshed on the next enrollment or program edit — save the program in the panel |
+| A front row renders blank | The class template references a `textModulesData` id the object does not emit. `_card_rows` and `_text_modules` must agree |
+| Pass labels are in the wrong language | `cards.language` was captured from the PWA when that customer enrolled (D16). It is per card, not per program |
 | `NotConfigured` / 503 | `GOOGLE_WALLET_SA_JSON` missing or not minified into the Lambda env (`with_env.py`, 4 KB limit) |
 | Push silently does nothing | The edit touched no `_WALLET_VISIBLE` column |
 

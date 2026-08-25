@@ -52,9 +52,30 @@
     is actually cleared — a program edit pushes to its installed passes (best-effort,
     bounded), and the **stamps/points balance is the pass title**. *No new credentials.*
 
+12. **A pass that reads like a card — the card-front template** — until now Google's
+    default Generic rendering decided everything, so the pass could show exactly three
+    things at a glance and everything else (holder, reward, validity) hid in the details
+    section the holder has to expand. Google's pass-customization guide supplies the
+    missing piece: `classTemplateInfo.cardTemplateOverride` draws labelled rows on the
+    **front** of the card, each cell bound to one of the object's `textModulesData`
+    entries. So the kicker now names the kind of card (loyalty / membership), the title
+    is the **program name**, and the balance moves out of the title into a labelled row
+    of its own — the stamp count as a `●●●○○○○○` strip *and* as the figure `3 / 8` next
+    to it, because dots are for recognition and numbers are for reading. Beside them:
+    rewards ready to claim, the reward itself under a label, and the member's name and
+    email. Three things had to change to make that safe. The class is no longer
+    create-only (`_ensure_class` now updates an existing one, or every program predating
+    the template would render the old pass forever). The save link now references the
+    created object by id rather than embedding it — the richer pass is ~2 035 encoded
+    characters against Google's 1 800-character URL limit, so the link stopped carrying
+    it instead of the layout being cut down to fit. And the pass is no longer
+    hardcoded Spanish: the card stores the language the customer had selected when they
+    enrolled and every label follows it. *No new credentials; one migration
+    (`cards.language`).*
+
 > Status is tracked in [STATUS.md](STATUS.md); remaining work is MVP-prioritized in
-> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–11 are done and deployed; Phase 7 (hardening)
-> was partly done and the rest lives in the backlog. Phases 8–11 ran ahead of 7 because they
+> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–12 are done and deployed; Phase 7 (hardening)
+> was partly done and the rest lives in the backlog. Phases 8–12 ran ahead of 7 because they
 > came from design revisions and field reports rather than the original plan.
 
 ## Multi-agent workflow
