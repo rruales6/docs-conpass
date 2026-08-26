@@ -51,18 +51,31 @@ emits renders blank, which reads as a broken pass rather than an absent value:
 
 | Row | Layout | `loyalty_stamps` | `loyalty_points` | `membership_pass` |
 |---|---|---|---|---|
-| 1 | `threeItems` | `hdr0` SELLOS `●●●○○○○○` · `hdr1` PROGRESO `3 / 8` · `hdr2` PREMIOS `1` | `hdr0` PUNTOS `120` · `hdr1` META `200` · `hdr2` PREMIOS `1` | `hdr0` ESTADO `Activa` · `hdr1` VÁLIDA HASTA `2026-12-31` · `hdr2` INCLUYE … |
+| 0 | `oneItem` | `hdr0` SELLOS `●●●○○○○○` — **the row exists only when the program draws a strip** | *(none)* | *(none)* |
+| 1 | `threeItems` | `hdr1` PROGRESO `3 / 8` · `hdr2` POR CANJEAR `1` · `hdr3` CANJEADOS `2` | `hdr1` PROGRESO `120 / 200` · `hdr2` POR CANJEAR · `hdr3` CANJEADOS | `hdr1` ESTADO `Activa` · `hdr2` VÁLIDA HASTA `2026-12-31` · `hdr3` INCLUYE … |
 | 2 | `oneItem` | `sec0` RECOMPENSA → the program's reward text. **Omitted from the template entirely** when the program defines no reward | | |
 | 3 | `twoItems` | `sec1` MIEMBRO → holder name · `sec2` CORREO → member email | | |
 
-Two rules behind that table:
+Four rules behind that table:
 
-- **The dot strip is for recognition, the figure for reading.** `stamp_strip()` draws `●○`
-  only when there is a target and it is at most `MAX_STAMP_DOTS` (12); past that the dots
-  blur together, so row 1 collapses to the plain count and the target.
+- **The strip gets a row to itself.** At a third of the card width, eight dots wrapped onto a
+  second line on a real phone. `_has_strip()` decides, and it deliberately reads only
+  *program*-level facts (type and target) — a class template cannot vary per holder, so
+  "does this card currently have few enough stamps" is not a question it may ask.
+- **The dot strip is for recognition, the figure for reading**, so `PROGRESO` states the pair
+  even when the strip is drawn. `stamp_strip()` returns `●○` only when there is a target and
+  it is at most `MAX_STAMP_DOTS` (12); past that the strip row disappears and the figures
+  carry it alone. The denominator is dropped only when a program has **no target at all**.
+- **Claimable and claimed are different numbers.** `POR CANJEAR` is `cards.rewards_available`
+  — earned and waiting — which goes *down* on a redemption. `CANJEADOS` is
+  `cards.rewards_redeemed`, a separate counter that only ever climbs. A membership has
+  nothing to claim, so it keeps the plain three-across row instead.
 - **A missing per-card value renders `—`, not blank.** Row shape is a *program* decision, so
   a reward-less program simply has no reward row. Name and email are *per card*, and a class
   template cannot vary by card — so an anonymous enrollment gets a placeholder (D15).
+
+> Cell labels are short on purpose (`POR CANJEAR`, not `PREMIOS POR CANJEAR`). A label that
+> wraps in a third-width cell is the same defect as the strip that forced this layout.
 
 Labels come from `_LABELS`, keyed by the card's own language (`cards.language`, captured from
 the enroll form — D16), not by the holder's device locale.
@@ -146,6 +159,8 @@ so toggling `active` costs nothing. A wallet outage never fails the program edit
 | Balance not visible without expanding | The program's class has no card-front template yet. It is refreshed on the next enrollment or program edit — save the program in the panel |
 | A front row renders blank | The class template references a `textModulesData` id the object does not emit. `_card_rows` and `_text_modules` must agree |
 | Pass labels are in the wrong language | `cards.language` was captured from the PWA when that customer enrolled (D16). It is per card, not per program |
+| A value wraps onto a second line | It is too wide for its cell. Give it a `oneItem` row, as the stamp strip has, or shorten the label |
+| `[TEST ONLY]` prefixes the merchant name | Google's own watermark for an issuer account that is not published yet — not something in our payload. It clears when the issuer is approved |
 | `NotConfigured` / 503 | `GOOGLE_WALLET_SA_JSON` missing or not minified into the Lambda env (`with_env.py`, 4 KB limit) |
 | Push silently does nothing | The edit touched no `_WALLET_VISIBLE` column |
 
