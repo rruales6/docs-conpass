@@ -177,4 +177,6 @@ not acceptable at scale.
   product decision to ship the single column; see BACKLOG P1.
 - **No automatic reconciliation.** Nothing checks your bank. Marking paid is entirely
   manual, and nothing reminds you that a `pending` client has been pending for a month.
-- **`mrrUsd` is derived from the tier**, not from money actually received.
+- **The admin MRR is an estimate from the plan catalog** (subscription price + card overage,
+  D17), not money actually received. The usage figure is a level count of active cards taken
+  when you look, so collect the amount shown on the day you invoice.

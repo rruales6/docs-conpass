@@ -22,7 +22,8 @@ Priority key:
 - **Least-privilege IAM + rotate secrets.** Replace the temporary AWS admin (`conpass-admin`)
   with the scoped policies already in `docs/aws/`; rotate the seeded demo/platform-admin
   passwords (currently shared test creds) before exposing prod. _(Phase 7 #10.)_
-- **Publish the transfer/DEUNA account details.** `platform_payment_settings` ships EMPTY, and
+- ~~**Publish the transfer/DEUNA account details.**~~ **Done** — seen published on the live signup page on 2026-10-15.
+  Original note: `platform_payment_settings` ships EMPTY, and
   signup deliberately refuses to take money while `accountNumber` is blank — the page says the
   details aren't published and the activate button stays disabled. **No merchant can subscribe
   until platform-admin fills this in** at `/admin` → *Datos de pago* (bank, account type +
@@ -40,11 +41,20 @@ Priority key:
   serverless deployment bucket there. Production (154320462594) is unaffected; `deploy.sh` now
   refuses the wrong account. Delete = empty the bucket, then delete the stack.
 
-> **TODO — owner review (2026-10-15):** the five operational items above (transfer details,
-> IAM + test passwords, issuer publishing, stray stack, plus domain/CORS) are parked for the
-> owner to check personally.
+> **TODO — owner review (2026-10-15):** the operational items above (IAM + test passwords,
+> issuer publishing, stray stack, domain/CORS) are parked for the owner to check personally.
+> Transfer details are already published.
 
 ## P1 — Soon after launch
+
+- **Self-service plan change.** The business model says plans are self-service, but a merchant
+  can only change plan by contacting conpass (the panel's *Su plan* card says so); admin applies it.
+  Needs an upgrade flow that takes payment for the new plan (today: a transfer receipt). _(Phase 13.)_
+- **Price lock per subscription.** The catalog is the only copy of prices (D17), so changing a price
+  re-prices every merchant at once. Before the first real price change, store the price agreed at
+  signup / plan change on the subscription. _(Phase 13.)_
+- **Meter notifications.** `notificationsUsed` is always 0 until notifications exist; when they ship,
+  count sends per calendar month so the Growth/Pro inclusion and overage bill correctly. _(Phase 13.)_
 
 - **Idempotency write atomicity.** A mutation `compute()` commits the balance change BEFORE
   the idempotency record is written (`run_idempotent` in `conpass_common/idempotency.py`), so
