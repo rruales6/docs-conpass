@@ -9,7 +9,7 @@ decisions, AWS setup, and design reference. Code lives in two sibling repos.
 
 | Repo | What |
 |---|---|
-| **[Conpass strategy.](https://github.com/rruales6/loyalty-programs)** | Brand, One page strategy, visual design. |
+| **[Conpass strategy.](https://github.com/rruales6/loyalty-programs)** | Brand, One page strategy, visual design, business model. |
 | **[bke-conpass](https://github.com/rruales6/bke-conpass)** | Backend — AWS Lambda (Python 3.12, ARM64), one SRP FastAPI Lambda per feature, Serverless Framework, Supabase Postgres. Contract-first OpenAPI 3.1. |
 | **[fte-conpass](https://github.com/rruales6/fte-conpass)** | Frontend — one unified installable React + Vite **PWA** (role-based: public / merchant / staff / platform-admin), duotone design system, ES/EN. |
 | **docs-conpass** (this) | Architecture, decisions, AWS runbooks, design reference. |
