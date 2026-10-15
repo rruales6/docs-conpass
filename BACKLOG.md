@@ -32,6 +32,17 @@ Priority key:
   above must now update **two** buckets — `conpass-program-assets-prod` and
   `conpass-payment-proofs-prod` both carry a `CorsConfiguration` allowlist in `serverless.yml`.
   Missing the new origin silently breaks browser uploads. _(Phase 10.)_
+- **Get the Google Wallet issuer account published.** Every pass shows a `[TEST ONLY]` prefix
+  on the merchant name. That is Google's watermark for an unpublished issuer (3388000000023155712),
+  not our payload; it clears once Google approves the issuer for production. _(Phase 12.)_
+- **Decide on the stray `conpass-api-prod` stack in account 705106722467.** An expired-session
+  deploy (2026-08-14) fell back to the default AWS profile and created an empty stack plus a
+  serverless deployment bucket there. Production (154320462594) is unaffected; `deploy.sh` now
+  refuses the wrong account. Delete = empty the bucket, then delete the stack.
+
+> **TODO — owner review (2026-10-15):** the five operational items above (transfer details,
+> IAM + test passwords, issuer publishing, stray stack, plus domain/CORS) are parked for the
+> owner to check personally.
 
 ## P1 — Soon after launch
 
