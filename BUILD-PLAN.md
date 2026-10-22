@@ -88,8 +88,17 @@
     birthday features themselves. Pro is back on the signup page; Enterprise left the
     product. *No new credentials; one migration (0011).*
 
+14. **Owner backlog — campaigns vocabulary, a frictionless demo, a clearer panel.**
+    "Programa" becomes **campaña** (fixed = accumulation; seasonal = date-bound discount,
+    designed in [design/SEASONAL-CAMPAIGNS.md](design/SEASONAL-CAMPAIGNS.md)), the demo
+    gets pre-filled forms and a visible way back to its menu on every screen, the panel
+    explains each section, and churn becomes a real **abandonment rate** with a
+    per-campaign N (migration `0012`). Credential emails go through Supabase Auth on the
+    owner's Hostinger SMTP ([RUNBOOK-EMAIL.md](RUNBOOK-EMAIL.md)). *No new credentials
+    for the first wave; email needs the owner's SMTP setup.*
+
 > Status is tracked in [STATUS.md](STATUS.md); remaining work is MVP-prioritized in
-> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–13 are done and deployed; Phase 7 (hardening)
+> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–13 are done; 14 is deployed except the credential emails and deployed; Phase 7 (hardening)
 > was partly done and the rest lives in the backlog. Phases 8–13 ran ahead of 7 because they
 > came from design revisions and field reports rather than the original plan.
 
