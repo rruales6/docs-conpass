@@ -93,13 +93,15 @@
     designed in [design/SEASONAL-CAMPAIGNS.md](design/SEASONAL-CAMPAIGNS.md)), the demo
     gets pre-filled forms and a visible way back to its menu on every screen, the panel
     explains each section, and churn becomes a real **abandonment rate** with a
-    per-campaign N (migration `0012`). Credential emails go through Supabase Auth on the
-    owner's Hostinger SMTP ([RUNBOOK-EMAIL.md](RUNBOOK-EMAIL.md)). *No new credentials
-    for the first wave; email needs the owner's SMTP setup.*
+    per-campaign N (migration `0012`). Seasonal campaigns ship on every plan (migrations
+    `0013`–`0014`), the plan catalog follows business model v2.0, and the panel follows
+    the owner's redesign — with access passes shown as not active (deprioritized).
+    *No new credentials.* Credential emails were moved to a later phase
+    ([RUNBOOK-EMAIL.md](RUNBOOK-EMAIL.md) has the setup).
 
 > Status is tracked in [STATUS.md](STATUS.md); remaining work is MVP-prioritized in
-> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–13 are done; 14 is deployed except the credential emails and deployed; Phase 7 (hardening)
-> was partly done and the rest lives in the backlog. Phases 8–13 ran ahead of 7 because they
+> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–14 are done and deployed; Phase 7 (hardening)
+> was partly done and the rest lives in the backlog. Phases 8–14 ran ahead of 7 because they
 > came from design revisions and field reports rather than the original plan.
 
 ## Multi-agent workflow

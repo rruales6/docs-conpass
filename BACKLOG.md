@@ -47,6 +47,20 @@ Priority key:
 
 ## P1 — Soon after launch
 
+- **Credential emails at signup (next phase candidate).** Today the owner's temporary password
+  is shown on screen once and `ownerInviteSent` is hard-coded `true`; no email is sent, and
+  *¿Olvidó su contraseña?* is a dead stub. Plan: Supabase Auth custom SMTP on the Hostinger
+  mailbox `no-reply@conpass.cards` → onboarding emails a **set-password link** (no password in
+  the inbox), `/reset-password` accepts it, `/forgot-password` sends one. Owner steps first
+  (mailbox, DKIM/DMARC, Supabase SMTP + rate limit + redirect URLs) — see
+  [RUNBOOK-EMAIL.md](RUNBOOK-EMAIL.md). _(Moved out of Phase 14.)_
+- **Access passes (membership_pass) — parked.** Shown in the panel as *No activo*; no access
+  codes, holder counts or create flow until the owner reprioritizes them. _(Phase 14.)_
+- **Seasonal: remove a discount %.** `PATCH /programs/{id}` can change but not clear
+  `discountPercent` once set (a text-only offer needs a new campaign). _(Phase 14.)_
+- **Copy register.** Owner-written strings use *tú*, the rest of the app *usted*; pick one.
+  _(Phase 14.)_
+
 - **Self-service plan change.** The business model says plans are self-service, but a merchant
   can only change plan by contacting conpass (the panel's *Su plan* card says so); admin applies it.
   Needs an upgrade flow that takes payment for the new plan (today: a transfer receipt). _(Phase 13.)_
