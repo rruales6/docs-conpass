@@ -47,13 +47,19 @@ Priority key:
 
 ## P1 — Soon after launch
 
-- **Credential emails at signup (next phase candidate).** Today the owner's temporary password
-  is shown on screen once and `ownerInviteSent` is hard-coded `true`; no email is sent, and
-  *¿Olvidó su contraseña?* is a dead stub. Plan: Supabase Auth custom SMTP on the Hostinger
-  mailbox `no-reply@conpass.cards` → onboarding emails a **set-password link** (no password in
-  the inbox), `/reset-password` accepts it, `/forgot-password` sends one. Owner steps first
-  (mailbox, DKIM/DMARC, Supabase SMTP + rate limit + redirect URLs) — see
-  [RUNBOOK-EMAIL.md](RUNBOOK-EMAIL.md). _(Moved out of Phase 14.)_
+- **Forgot password.** *¿Olvidó su contraseña?* (`/forgot-password`, `/reset-password`) is still a
+  stub. With the D18 sender in place: a public endpoint issues a temporary password (or a
+  one-time link via `admin.generate_link`) and emails it, rate-limited per address. Until
+  then, platform-admin resends credentials from Función 04. _(Phase 15.)_
+- **Operation-user credentials by email.** Cashier temporary passwords are still shown in the
+  panel (create + reset). Needs real cashier addresses; reuse `credentials_email` +
+  `must_change_password`. _(Phase 15.)_
+- **Server-side forced-change gate.** `must_change_password` is enforced by the PWA only (D18).
+  If needed, `require_identity` could answer 403 `password_change_required` on every route
+  except `GET /me` and `POST /me/password`. _(Phase 15.)_
+- **Email deliverability hardening.** No bounce/complaint handling and no retry queue; DMARC
+  is `p=none` (move to `quarantine` once reports are clean); the SMTP password is a plain
+  Lambda env var (move to SSM with the other secrets). _(Phase 15.)_
 - **Access passes (membership_pass) — parked.** Shown in the panel as *No activo*; no access
   codes, holder counts or create flow until the owner reprioritizes them. _(Phase 14.)_
 - **Seasonal: remove a discount %.** `PATCH /programs/{id}` can change but not clear

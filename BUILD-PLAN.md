@@ -96,12 +96,24 @@
     per-campaign N (migration `0012`). Seasonal campaigns ship on every plan (migrations
     `0013`–`0014`), the plan catalog follows business model v2.0, and the panel follows
     the owner's redesign — with access passes shown as not active (deprioritized).
-    *No new credentials.* Credential emails were moved to a later phase
-    ([RUNBOOK-EMAIL.md](RUNBOOK-EMAIL.md) has the setup).
+    *No new credentials.* Credential emails were moved to Phase 15.
+
+15. **Credential email for new merchant owners.** Signup used to show the owner's
+    temporary password on screen and claim an invite had been sent when none was. Now
+    the password is **emailed** and the PWA makes the owner replace it at first login
+    (`app_metadata.must_change_password`, cleared by `POST /me/password`).
+    Platform-admin can **resend** credentials from Función 04, which issues a fresh
+    password. Email goes out through **one generic SMTP sender** in the shared layer
+    (stdlib `smtplib`, no new dependency) from the Hostinger mailbox
+    `no-reply@conpass.cards`. Moving to SES or Brevo later is a settings change (**D18**,
+    [RUNBOOK-EMAIL.md](RUNBOOK-EMAIL.md)). A failed email never fails a signup; it is
+    reported (`ownerInviteSent`) and admin resends. The shared demo owner is never
+    flagged and never sent anything.
+    *Needs the mailbox credentials in `secrets.yaml` (`conpass.conpass-no-reply-sender`).*
 
 > Status is tracked in [STATUS.md](STATUS.md); remaining work is MVP-prioritized in
-> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–14 are done and deployed; Phase 7 (hardening)
-> was partly done and the rest lives in the backlog. Phases 8–14 ran ahead of 7 because they
+> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–15 are done and deployed; Phase 7 (hardening)
+> was partly done and the rest lives in the backlog. Phases 8–15 ran ahead of 7 because they
 > came from design revisions and field reports rather than the original plan.
 
 ## Multi-agent workflow
@@ -132,4 +144,5 @@ Work proceeds offline until it hits one of these; then it pauses and asks:
   no new secret — uses the existing `aws.*` deploy credentials).
 - **Phase 10** needs a second **AWS S3** bucket for payment proofs (**private** — all public
   access blocked; also created by `serverless.yml`, again no new secret).
+- **Phase 15** needs the sender mailbox's SMTP credentials (`conpass-no-reply-sender.{email,password}`).
 - **Deploy** needs `aws.*` (region, profile/keys).

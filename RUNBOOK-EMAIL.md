@@ -1,67 +1,97 @@
-# Email setup — sending signup credentials (Phase 14)
+# Email runbook — transactional email from the Lambdas (Phase 15)
 
-Goal: when a merchant subscribes, the owner gets an email from conpass with a link to
-**set their own password**. A password should never travel in an email; the current
-on-screen temporary password stays as a fallback. The same setup also makes
-"¿Olvidó su contraseña?" work, because that page is still a dead stub today.
+conpass sends email itself through **one generic SMTP sender** in the shared layer
+(**D18**). Today it sends one kind of message: **signup credentials**. When a merchant
+subscribes, the owner gets a temporary password by email, and the PWA makes them replace
+it at first login. Platform-admin can resend credentials from Función 04.
 
-conpass.cards mail is already hosted on **Hostinger**: its MX records point to
-`mx1/mx2.hostinger.com` and its SPF record includes `_spf.mail.hostinger.com`.
+## How it works
 
-## Recommended: Supabase Auth → Hostinger SMTP
+```
+POST /merchants ─▶ provision owner (Supabase Auth, app_metadata.must_change_password=true,
+                   user_metadata.language=es|en)
+               ─▶ get_email_sender().send(credentials_email(...))   ── smtp.hostinger.com:465
+               ─▶ 201 {ownerInviteSent: true|false, ownerEmail}      (never the password)
 
-Supabase Auth already knows how to send "invite" and "reset password" emails with a
-secure one-time link. Out of the box it sends through Supabase's own mailer, which is
-limited to **about 2 emails per hour** and is not meant for production. You point it at a
-Hostinger mailbox instead. Then:
+First login ─▶ /me says mustChangePassword ─▶ PWA shows only /change-password
+           ─▶ POST /me/password {newPassword}  (sets the password + clears the flag in one
+              admin update) ─▶ PWA signs in again with the new password ─▶ role home
 
-- the Lambdas never hold an email password: it lives only in the Supabase dashboard;
-- there is no new AWS service, IAM permission or library;
-- signup emails and forgot-password emails share one path.
+Función 04 ─▶ POST /admin/clients/{id}/resend-credentials
+           ─▶ new temp password + flag set again ─▶ email (same template, "resend" wording)
+```
 
-### Step by step (owner)
+| Piece | Where |
+|---|---|
+| Sender (`EmailSender`, `SmtpEmailSender`, `StubEmailSender`) | `backend/layers/common/python/conpass_common/providers/email.py` |
+| Choosing the sender | `providers/factory.py` → `get_email_sender()`, keyed on `CONPASS_EMAIL_PROVIDER` (`stub` by default, `smtp` in the deployed Lambdas) |
+| Settings | `conpass_common/config.py` (`smtp_*`, `email_from_name`, `email_reply_to`, `console_login_url`) |
+| Credentials email (ES/EN) | `conpass_common/email_templates.py` → `credentials_email()` |
+| Flag + temp password helpers | `conpass_common/provisioning.py` → `provision_user(must_change_password=…)`, `issue_temp_password()`, `complete_password_change()` |
+| Endpoints | `POST /merchants` (merchants), `GET /me` + `POST /me/password` (identity), `POST /admin/clients/{merchantId}/resend-credentials` (admin) |
+| PWA | `auth/AuthContext.tsx` (`mustChangePassword`, `changePassword`), `pages/auth/ChangePasswordPage.tsx`, signup `ActivationScreen`, admin *Gestionar cuenta* → *Reenviar credenciales* |
 
-1. **Create the sender mailbox.** In hPanel go to **Emails**, open conpass.cards, and
-   create `no-reply@conpass.cards` with a strong password. Then go to **Emails →
-   Mailboxes → View limits** to see its daily sending cap.
-   - Hostinger caps each mailbox per rolling 24 hours: free/trial mailboxes 100/day,
-     Business Starter 1 000/day, Business Premium 3 000/day.
-   - Signups are low volume, so any of these is enough to start.
-2. **Authenticate the domain** so the mail doesn't land in spam. In hPanel go to
-   **Emails → conpass.cards → DNS settings / Connect domain**:
-   - SPF: already present (`v=spf1 include:_spf.mail.hostinger.com ~all`). Leave it.
-   - DKIM: enable it, or add the `hostingermail-*._domainkey` CNAME/TXT records hPanel shows.
-   - DMARC: add a TXT record named `_dmarc` with the value
-     `v=DMARC1; p=none; rua=mailto:info@conpass.cards`.
-3. **Point Supabase at Hostinger.** In the Supabase dashboard go to **Authentication →
-   Emails → SMTP Settings**, enable custom SMTP, and enter:
-   - Host `smtp.hostinger.com`, port `465` (SSL/TLS)
-   - Username `no-reply@conpass.cards`, plus that mailbox's password
-   - Sender email `no-reply@conpass.cards`, sender name `conpass`
-4. **Raise the auth email rate limit.** In **Authentication → Rate Limits**, set
-   "emails sent per hour" to 30–100. That stays well inside Hostinger's daily cap.
-5. **Allow the link to come back to the app.** In **Authentication → URL
-   Configuration**:
-   - Site URL: `https://console.conpass.cards`
-   - Redirect URLs: add `https://console.conpass.cards/reset-password`
-6. **Tell Claude it's done.** The code side is then:
-   - onboarding asks Supabase to email the owner a set-password link;
-   - `/reset-password` accepts that link;
-   - `/forgot-password` sends one;
-   - `ownerInviteSent` becomes truthful (it is hard-coded `true` today);
-   - the email templates (invite and reset) are written in Spanish, with English
-     variants, in conpass branding.
+## Settings
 
-No secrets change in `secrets.yaml`. The Hostinger password is typed only into Supabase.
+| Setting | Value | Where it comes from |
+|---|---|---|
+| Host | `smtp.hostinger.com` | code default; override with `SMTP_HOST` or `conpass-no-reply-sender.host` |
+| Port | `465` (implicit TLS). `587` switches the sender to STARTTLS | code default; override with `SMTP_PORT` or `conpass-no-reply-sender.port` |
+| Username = From | `no-reply@conpass.cards` | `secrets.yaml` → `conpass.conpass-no-reply-sender.email` |
+| Password | the mailbox password | `secrets.yaml` → `conpass.conpass-no-reply-sender.password` |
+| From name / Reply-To | `conpass` / `info@conpass.cards` | code defaults |
+| Login link in the email | `https://console.conpass.cards/login` | code default (`CONPASS_CONSOLE_LOGIN_URL`) |
 
-## Alternatives
+`scripts/with_env.py` copies the username and password from `secrets.yaml` into the deploy
+environment, and `serverless.yml` passes them to every Lambda as `SMTP_USERNAME` /
+`SMTP_PASSWORD` (plain env vars, the same posture as the Supabase secret key; moving secrets
+to SSM is in the backlog). Nothing is printed or logged: the sender logs only the
+recipient and subject, never a body, because the body holds a password.
 
-| Option | Good for | What it needs | Trade-off |
-|---|---|---|---|
-| **Amazon SES** (directly from the Lambda, or as Supabase's SMTP) | High volume and best deliverability; already inside the AWS account | Verify conpass.cards in SES (3 DKIM CNAMEs added in Hostinger DNS), then **request production access** (an AWS review, usually about a day). The Lambda needs IAM `ses:SendEmail`. | About $0.10 per 1 000 emails, and more setup steps. Until production access is granted, SES only sends to verified addresses. |
-| **Resend / Brevo** (as Supabase's SMTP, or by API) | Nice dashboards, logs and templates | An account, their DNS records in Hostinger, and an SMTP password or API key | One more vendor. Free tiers are capped per day/month (check their current pricing). |
-| **Hostinger SMTP directly from the Lambda** | Sending custom emails beyond auth (receipts, campaign notices) | The mailbox password stored in `secrets.yaml` and the Lambda env | A mailbox password ends up in AWS config, and the Lambda has to build its own reset-link flow. Not worth it for credentials alone. |
+DNS for conpass.cards, checked 2026-11-05:
+- MX: `mx1/mx2.hostinger.com`
+- SPF: `v=spf1 include:_spf.mail.hostinger.com ~all`
+- DKIM: `hostingermail-a._domainkey`
+- DMARC: `v=DMARC1; p=none`
 
-**Path forward:** start with Supabase + Hostinger, which needs no new vendor and no
-code-side secret. If volume grows or deliverability suffers, swap only the SMTP
-credentials in step 3 to SES or Brevo. Nothing in the code changes.
+## Limits
+
+- **Hostinger caps sending per mailbox** over a rolling 24 hours: about 100 per day on a
+  free or trial mailbox, 1 000 on Business Starter, 3 000 on Business Premium. Check
+  hPanel → Emails → View limits. Signups are low volume.
+- **There is no retry queue.** A failed signup email leaves `ownerInviteSent=false`, and
+  admin resends.
+- **Each resend issues a new password.** Only the latest password works. The admin button
+  is disabled while a resend is in flight.
+- **The SMTP step has a 6 s socket timeout**, so an unreachable relay cannot use up the
+  15 s Lambda timeout.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Signup screen says the email could not be sent | Relay unreachable, wrong password, or Hostinger daily cap reached | CloudWatch for the merchants Lambda: look for `owner_credentials_email_failed` / `email_send_failed` (error class only). Check the mailbox in hPanel, then resend from Función 04 |
+| Resend answers **503** | `SMTP_USERNAME`/`SMTP_PASSWORD` missing in the Lambda env | Confirm both keys exist in `secrets.yaml`, then redeploy with `bash scripts/deploy.sh conpass prod --force` |
+| Resend answers **502** | The password **was reset** but the email failed | Retry. Each attempt issues a new password, so the failed one never worked anyway |
+| Resend answers **409** | It is the demo merchant | By design: the demo uses a shared password |
+| Email lands in spam | New mailbox, DMARC at `p=none` | Mark it as not spam once. Later, move DMARC to `p=quarantine` once reports look clean (backlog) |
+| Owner never sees the change-password page | They signed in before the flag was set, or with an old token | Sign out and sign in again; `/me` returns `mustChangePassword` from the token |
+
+## Switching provider
+
+Only settings change:
+- **Amazon SES (SMTP interface):** verify conpass.cards in SES (3 DKIM CNAMEs in Hostinger
+  DNS), request production access, and create SMTP credentials. Then set
+  `SMTP_HOST=email-smtp.us-east-1.amazonaws.com`, `SMTP_PORT=587`, and the SES SMTP
+  username/password. Cost: $0.10 per 1 000 emails.
+- **Brevo:** `smtp-relay.brevo.com:587` with its SMTP key. The free plan allows 300 per day.
+
+Add the provider's SPF include to the conpass.cards TXT record when you switch.
+
+## Not covered yet (backlog)
+
+- forgot-password (`/forgot-password`, `/reset-password` are still stubs)
+- emails for operation users (their temporary password is still shown in the panel)
+- a server-side forced-change gate
+- bounce handling
+- SSM for the SMTP password
