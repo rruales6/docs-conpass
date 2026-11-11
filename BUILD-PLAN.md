@@ -111,9 +111,24 @@
     flagged and never sent anything.
     *Needs the mailbox credentials in `secrets.yaml` (`conpass.conpass-no-reply-sender`).*
 
+16. **Wallet notifications, locales and balance expiry.** The owner's "Notificaciones en el
+    wallet" design: **automations** (balance change, reward ready, near goal, visit
+    milestone, balance expiry warning, inactivity reminder — Pro), **manual sends** (aviso
+    general, evento, flash sale; audiences all / near goal / 30 days inactive / level ≥ N /
+    customers of a locale; optional link; send now or schedule), **locales** with
+    coordinates for Google's "Estás cerca", **history** with visits within 48 h, and the
+    platform-admin **sending rules** (max per card per day 1–3, quiet hours 21:00–08:00).
+    Owner decisions: balance expiry is by inactivity and a merchant-wide parameter (really
+    zeroes the balance, rewards are kept); level = 1 + rewards reached; cashiers are
+    assigned locales and pick one when scanning; personalised reward codes are out. An
+    outbox + a scheduled `notifier` Lambda apply the rules and call Google `addMessage`;
+    the pass carries NIVEL / SALDO VENCE, its messages and nearby points, all re-derived
+    from the DB because every wallet write is a full PUT (**D19**,
+    [design/NOTIFICATIONS.md](design/NOTIFICATIONS.md)). *No new credentials.*
+
 > Status is tracked in [STATUS.md](STATUS.md); remaining work is MVP-prioritized in
-> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–15 are done and deployed; Phase 7 (hardening)
-> was partly done and the rest lives in the backlog. Phases 8–15 ran ahead of 7 because they
+> [BACKLOG.md](BACKLOG.md). Phases 1–6 and 8–16 are done and deployed; Phase 7 (hardening)
+> was partly done and the rest lives in the backlog. Phases 8–16 ran ahead of 7 because they
 > came from design revisions and field reports rather than the original plan.
 
 ## Multi-agent workflow

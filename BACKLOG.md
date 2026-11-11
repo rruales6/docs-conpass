@@ -73,8 +73,12 @@ Priority key:
 - **Price lock per subscription.** The catalog is the only copy of prices (D17), so changing a price
   re-prices every merchant at once. Before the first real price change, store the price agreed at
   signup / plan change on the subscription. _(Phase 13.)_
-- **Meter notifications.** `notificationsUsed` is always 0 until notifications exist; when they ship,
-  count sends per calendar month so the Growth/Pro inclusion and overage bill correctly. _(Phase 13.)_
+- **Personalised reward codes** (design "Recompensa personalizada": a unique code per customer,
+  redeemable at the cashier, shown in the redemptions report). Out of Phase 16 by owner decision.
+- **Apple Wallet notifications** (field-change pushes, `relevantDate` for events) — with Apple
+  Wallet itself. The event "highlight on the lock screen" in the owner's design is Apple-only.
+- **Offline replay of a scan whose locale was paused** returns 422 `location_not_allowed`; the
+  cashier queue should then retry without the locale instead of keeping the item stuck. _(Phase 16.)_
 
 - **Idempotency write atomicity.** A mutation `compute()` commits the balance change BEFORE
   the idempotency record is written (`run_idempotent` in `conpass_common/idempotency.py`), so
@@ -178,7 +182,6 @@ Priority key:
 
 - **Birthday automation** — `PUT /programs/{id}/birthday-automation`, `POST /birthday-cards`
   remain `501`.
-- **Notifications / reminders** — `POST /notifications/reminders` remains `501`.
 - **Real payment + messaging providers.** Payment (activation is manual: the merchant uploads a
   transfer receipt, platform-admin verifies it and marks paid) and messaging (WhatsApp/email)
   are stubbed behind interfaces by design. Real integrations — and thus automated
